@@ -64,8 +64,8 @@ function HeroSection() {
       </div>
 
       {/* Floating Ambient Orbs for visual depth */}
-      <div className="absolute top-1/4 left-1/4 w-[30rem] h-[30rem] bg-background/40 rounded-full blur-[100px] pointer-events-none mix-blend-overlay" style={{ animation: 'floatA 15s ease-in-out infinite' }} />
-      <div className="absolute bottom-1/4 right-1/4 w-[25rem] h-[25rem] bg-foreground/5 rounded-full blur-[80px] pointer-events-none mix-blend-overlay" style={{ animation: 'floatB 12s ease-in-out infinite reverse' }} />
+      <div className="absolute top-1/4 left-1/4 w-[30rem] h-[30rem] bg-background/40 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-[25rem] h-[25rem] bg-foreground/5 rounded-full blur-[80px] pointer-events-none" />
 
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
@@ -107,7 +107,7 @@ function HeroSection() {
 function AboutSection() {
   return (
     <section className="bg-background py-24 px-6 relative overflow-hidden">
-      <div className="max-w-5xl mx-auto relative z-10">
+      <div className="max-w-7xl mx-auto relative z-10">
         <AnimatedElement>
           <h2
             className="text-3xl md:text-4xl font-bold text-foreground mb-16 tracking-tight text-center"
@@ -150,7 +150,7 @@ function AboutSection() {
 function ContactSection() {
   return (
     <section className="bg-background pb-24 px-6">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Contact Grid matching screenshot dark buttons */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           {[
@@ -203,7 +203,7 @@ function AchievementsSection() {
 
   return (
     <section className="bg-secondary/50 py-24 px-6 border-t border-border/50">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <AnimatedElement>
           <div className="flex items-center gap-4 mb-12">
             <h2
@@ -250,7 +250,7 @@ function SkillsSection() {
     <section className="bg-background py-24 px-6 relative">
       <div className="absolute inset-0 bg-[radial-gradient(circle,_hsl(var(--border))_1px,_transparent_1px)] bg-[length:32px_32px] opacity-30 pointer-events-none" />
       
-      <div className="max-w-4xl mx-auto relative z-10 text-center">
+      <div className="max-w-6xl mx-auto relative z-10 text-center">
         <AnimatedElement>
           <h2
             className="text-2xl md:text-3xl font-bold text-foreground mb-12 tracking-tight"
@@ -281,16 +281,6 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-background text-foreground font-sans selection:bg-foreground selection:text-background">
       <style dangerouslySetInnerHTML={{__html: `
-        @keyframes floatA {
-          0%, 100% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-        }
-        @keyframes floatB {
-          0%, 100% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(-30px, 40px) scale(1.1); }
-          66% { transform: translate(20px, -20px) scale(0.9); }
-        }
         @keyframes shimmer {
           100% { transform: translateX(100%); }
         }

@@ -35,7 +35,7 @@ export default function ProjectDetail() {
         Back
       </Link>
 
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
           <div>
@@ -66,7 +66,7 @@ export default function ProjectDetail() {
 
         {/* Preview */}
         <div className="relative rounded-xl overflow-hidden shadow-2xl border border-border/60 mb-12 group">
-          <img src={project.preview} alt={`${project.name} preview`} className="w-full object-cover" />
+          <img src={project.preview} alt={`${project.name} preview`} loading="lazy" decoding="async" className="w-full object-cover" />
         </div>
 
         {/* Skills */}

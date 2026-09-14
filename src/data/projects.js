@@ -4,7 +4,7 @@ export const projects = [
     name: "Lexio Reading",
     url: "https://lexioreading.app",
     tagline: "Your reading life, supercharged.",
-    preview: "https://s0.wp.com/mshots/v1/https%3A%2F%2Flexioreading.app?w=1280&h=800",
+    preview: "https://s0.wp.com/mshots/v1/https%3A%2F%2Flexioreading.app?w=1024&h=640",
     skills: ["AI Leverage", "App Development", "Book Data APIs", "Product Design", "Web Fabrication"],
     summary:
       "Lexio Reading is an AI-powered reading platform. Discover trending titles, search millions of books, track your personal library, and chat with an AI reading companion that learns your taste over time.",
@@ -18,7 +18,7 @@ export const projects = [
     name: "DebateLab",
     url: "https://debatelab.pro",
     tagline: "Your debate prep, supercharged.",
-    preview: "https://s0.wp.com/mshots/v1/https%3A%2F%2Fdebatelab.pro?w=1280&h=800",
+    preview: "https://s0.wp.com/mshots/v1/https%3A%2F%2Fdebatelab.pro?w=1024&h=640",
     skills: ["AI Leverage", "Parliamentary Debate", "App Development", "Coaching Systems", "Web Fabrication"],
     summary:
       "DebateLab is an AI-powered debate prep platform: generate tournament-ready contentions for any resolution in seconds, debate practice rounds against an AI opponent with a full judge decision, get AI coaching insights and a custom prep plan, and draft MUN documents — all in one place.",
@@ -32,7 +32,7 @@ export const projects = [
     name: "Lexio Edu",
     url: "https://lexioedu.org",
     tagline: "Lexio for your entire school.",
-    preview: "https://s0.wp.com/mshots/v1/https%3A%2F%2Flexioedu.org?w=1280&h=800",
+    preview: "https://s0.wp.com/mshots/v1/https%3A%2F%2Flexioedu.org?w=1024&h=640",
     skills: ["AI Leverage", "EdTech", "App Development", "Data Dashboards", "Web Fabrication"],
     summary:
       "Lexio Edu is the school edition of Lexio. Students join with their school's 6-digit code — or get matched to their school automatically by email — and land in their school's own private reading platform, separate from public Lexio.",
@@ -46,7 +46,7 @@ export const projects = [
     name: "Actio Productivity",
     url: "https://actioproductivity.com",
     tagline: "Your life, supercharged.",
-    preview: "https://s0.wp.com/mshots/v1/https%3A%2F%2Factioproductivity.com?w=1280&h=800",
+    preview: "https://s0.wp.com/mshots/v1/https%3A%2F%2Factioproductivity.com?w=1024&h=640",
     skills: ["AI Leverage", "Gmail & Calendar Sync", "Task Systems", "App Development", "Automation"],
     summary:
       "Actio is an AI-powered productivity platform: a brain dump that turns messy notes, emails, and voice memos into filed tasks, a smart planner that builds realistic daily and weekly plans, and an AI assistant that answers 'what should I focus on today?' — with Gmail and Calendar sync built in.",
@@ -60,7 +60,7 @@ export const projects = [
     name: "SusorBus",
     url: "https://susorbus.com",
     tagline: "Is it bussin or sus?",
-    preview: "https://s0.wp.com/mshots/v1/https%3A%2F%2Fsusorbus.com?w=1280&h=800",
+    preview: "https://s0.wp.com/mshots/v1/https%3A%2F%2Fsusorbus.com?w=1024&h=640",
     skills: ["AI Leverage", "Web Safety Analysis", "Full-Stack Development", "NLP", "Web Fabrication"],
     summary:
       "SusorBus is a web safety analyzer with a sense of humor. Paste a link, HTML, code, an email, or any text, and it gives you an instant safety verdict — is it bussin or sus? — flagging phishing, scams, and sketchy content.",

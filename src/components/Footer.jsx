@@ -3,7 +3,7 @@ import { Phone, Mail, Linkedin, Download } from "lucide-react";
 export default function Footer() {
   return (
     <footer className="bg-foreground text-background py-10 px-6 border-t border-border">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
           {/* Brand */}
           <div>

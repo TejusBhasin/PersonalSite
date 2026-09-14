@@ -34,6 +34,8 @@ function ProjectCard({ project, index }) {
         <img
           src={project.preview}
           alt={`${project.name} preview`}
+          loading="lazy"
+          decoding="async"
           className="w-full aspect-[16/10] object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
         />
         <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/20 transition-colors duration-300 flex items-center justify-center">
@@ -110,7 +112,7 @@ export default function LargeProjectsSection() {
           to { opacity: 1; transform: translateY(0); }
         }
       `}} />
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-4 mb-12" style={{ animation: "cardReveal 0.8s ease-out both" }}>
           <h2
             className="text-2xl md:text-3xl font-bold text-foreground tracking-tight"

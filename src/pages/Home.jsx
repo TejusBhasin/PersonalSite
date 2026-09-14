@@ -51,7 +51,7 @@ const AnimatedElement = ({ children, className = "", delay = 0, direction = "up"
 
 function HeroSection() {
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center bg-secondary -mt-[76px] pt-[76px]">
+    <section className="relative overflow-hidden min-h-[90vh] flex items-center justify-center bg-secondary -mt-[76px] pt-[76px]">
       
       {/* Abstract Wave Background (matching screenshot aesthetic) */}
       <div className="absolute inset-0 pointer-events-none opacity-40">
@@ -71,7 +71,7 @@ function HeroSection() {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-10 w-full max-w-4xl px-6"
+        className="relative z-10 w-full max-w-7xl px-6"
       >
         {/* Main Hero Card exactly matching screenshot structure */}
         <div className="border-[4px] border-foreground/80 rounded-2xl bg-background/30 backdrop-blur-md px-8 py-16 sm:px-16 sm:py-20 text-center shadow-2xl overflow-hidden relative group">
@@ -279,7 +279,7 @@ function SkillsSection() {
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-background text-foreground font-sans selection:bg-foreground selection:text-background">
+    <main className="min-h-screen w-full overflow-x-clip bg-background text-foreground font-sans selection:bg-foreground selection:text-background">
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes shimmer {
           100% { transform: translateX(100%); }

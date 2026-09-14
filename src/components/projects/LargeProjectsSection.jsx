@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, ArrowRight } from "lucide-react";
 import { projects } from "@/data/projects";
 
 const SkillBubble = ({ skill, onClick }) => (
@@ -83,6 +83,19 @@ function ProjectCard({ project, index }) {
             </button>
           )}
         </div>
+
+        {/* See more — opens the full-screen project page */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            openProject();
+          }}
+          className="mt-5 pt-4 border-t border-border/60 w-full inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-foreground/50 group-hover:text-foreground transition-colors duration-300 cursor-pointer"
+          style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}
+        >
+          See More
+          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1.5 transition-transform duration-300" />
+        </button>
       </div>
     </div>
   );

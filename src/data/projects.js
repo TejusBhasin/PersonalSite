@@ -4,7 +4,7 @@ export const projects = [
     name: "Lexio Reading",
     url: "https://lexioreading.app",
     tagline: "Your reading life, supercharged.",
-    preview: "https://media.base44.com/images/public/6a29e04307b892bb19072d29/334e5a043_generated_image.png",
+    preview: "https://s0.wp.com/mshots/v1/https%3A%2F%2Flexioreading.app?w=1280&h=800",
     skills: ["AI Leverage", "App Development", "Book Data APIs", "Product Design", "Web Fabrication"],
     summary:
       "Lexio Reading is an AI-powered reading platform. Discover trending titles, search millions of books, track your personal library, and chat with an AI reading companion that learns your taste over time.",
@@ -18,7 +18,7 @@ export const projects = [
     name: "DebateLab",
     url: "https://debatelab.pro",
     tagline: "Your debate prep, supercharged.",
-    preview: "https://media.base44.com/images/public/6a29e04307b892bb19072d29/8a8098dd4_generated_image.png",
+    preview: "https://s0.wp.com/mshots/v1/https%3A%2F%2Fdebatelab.pro?w=1280&h=800",
     skills: ["AI Leverage", "Parliamentary Debate", "App Development", "Coaching Systems", "Web Fabrication"],
     summary:
       "DebateLab is an AI-powered debate prep platform: generate tournament-ready contentions for any resolution in seconds, debate practice rounds against an AI opponent with a full judge decision, get AI coaching insights and a custom prep plan, and draft MUN documents — all in one place.",
@@ -30,23 +30,23 @@ export const projects = [
   {
     slug: "lexio-edu",
     name: "Lexio Edu",
-    url: "https://lexioedu.app",
-    tagline: "AI-powered reading for classrooms.",
-    preview: "https://media.base44.com/images/public/6a29e04307b892bb19072d29/e53000789_generated_image.png",
+    url: "https://lexioedu.org",
+    tagline: "Lexio for your entire school.",
+    preview: "https://s0.wp.com/mshots/v1/https%3A%2F%2Flexioedu.org?w=1280&h=800",
     skills: ["AI Leverage", "EdTech", "App Development", "Data Dashboards", "Web Fabrication"],
     summary:
-      "Lexio Edu brings the Lexio reading platform into classrooms and schools. Teachers get a dashboard with student reading progress and a shared class library, while students get the same AI-powered discovery and reading companion built for their class.",
+      "Lexio Edu is the school edition of Lexio. Students join with their school's 6-digit code — or get matched to their school automatically by email — and land in their school's own private reading platform, separate from public Lexio.",
     why:
-      "After building Lexio Reading, I realized the same tools that made reading personal for me could make it measurable for teachers. Lexio Edu takes the reading companion students love and adds the progress tracking and class libraries that schools actually need.",
+      "After building the public Lexio app, I wanted to bring the same AI reading tools to entire schools. Lexio Edu gives every school its own private space, with a secure authorization flow so only real schools can be created and only their students get in.",
     description:
-      "A teacher dashboard tracks each student's reading progress and class-wide trends, a shared class library lets teachers curate what students discover, and every student gets AI recommendations matched to their reading level and interests."
+      "Admins create a school using a 300-character authorization code, students join instantly with their school's 6-digit code, and anyone without a code is matched to their school by email automatically. Each school gets its own isolated Lexio platform, with public LexioReading.App always one click away."
   },
   {
     slug: "actio",
     name: "Actio Productivity",
     url: "https://actioproductivity.com",
     tagline: "Your life, supercharged.",
-    preview: "https://media.base44.com/images/public/6a29e04307b892bb19072d29/2ec92c17c_generated_image.png",
+    preview: "https://s0.wp.com/mshots/v1/https%3A%2F%2Factioproductivity.com?w=1280&h=800",
     skills: ["AI Leverage", "Gmail & Calendar Sync", "Task Systems", "App Development", "Automation"],
     summary:
       "Actio is an AI-powered productivity platform: a brain dump that turns messy notes, emails, and voice memos into filed tasks, a smart planner that builds realistic daily and weekly plans, and an AI assistant that answers 'what should I focus on today?' — with Gmail and Calendar sync built in.",
@@ -60,7 +60,7 @@ export const projects = [
     name: "SusorBus",
     url: "https://susorbus.com",
     tagline: "Is it bussin or sus?",
-    preview: "https://media.base44.com/images/public/6a29e04307b892bb19072d29/846030cda_generated_image.png",
+    preview: "https://s0.wp.com/mshots/v1/https%3A%2F%2Fsusorbus.com?w=1280&h=800",
     skills: ["AI Leverage", "Web Safety Analysis", "Full-Stack Development", "NLP", "Web Fabrication"],
     summary:
       "SusorBus is a web safety analyzer with a sense of humor. Paste a link, HTML, code, an email, or any text, and it gives you an instant safety verdict — is it bussin or sus? — flagging phishing, scams, and sketchy content.",

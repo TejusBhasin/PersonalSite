@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Phone, Linkedin, Mail, Download, Award, ChevronRight, BookOpen, Camera, Trophy, Users } from "lucide-react";
+import { Phone, Linkedin, Mail, Download, Award, BookOpen, Camera, Trophy, Users } from "lucide-react";
+import LargeProjectsSection from "@/components/projects/LargeProjectsSection";
 
 // --- Utility Components ---
 
@@ -228,10 +229,6 @@ function AchievementsSection() {
                   {item.title}
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed flex-1">{item.desc}</p>
-                <div className="mt-6 flex items-center text-xs font-bold uppercase tracking-widest text-foreground/40 group-hover:text-foreground transition-colors duration-300">
-                  <span className="w-0 overflow-hidden group-hover:w-16 transition-all duration-300 whitespace-nowrap">View more</span>
-                  <ChevronRight className="w-4 h-4 ml-1 -translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300" />
-                </div>
               </div>
             </AnimatedElement>
           ))}
@@ -302,6 +299,7 @@ export default function Home() {
       <AboutSection />
       <ContactSection />
       <AchievementsSection />
+      <LargeProjectsSection />
       <SkillsSection />
     </main>
   );

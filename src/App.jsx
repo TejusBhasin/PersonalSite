@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
 import Layout from './components/Layout';
+import ProjectDetail from './pages/ProjectDetail';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -39,6 +40,7 @@ const AuthenticatedApp = () => {
         <Route path="/Register" element={<Register />} />
         {/* Add your page Route elements here */}
       </Route>
+      <Route path="/project/:slug" element={<ProjectDetail />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

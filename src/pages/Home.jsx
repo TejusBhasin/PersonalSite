@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Phone, Linkedin, Mail, Download, Award, BookOpen, Camera, Trophy, Users } from "lucide-react";
 import LargeProjectsSection from "@/components/projects/LargeProjectsSection";
+import DebateAwardsCard from "@/components/awards/DebateAwardsCard";
 
 // --- Utility Components ---
 
@@ -218,6 +219,11 @@ function AchievementsSection() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {achievements.map((item, index) => (
+            item.title === "Debate Awards" ? (
+              <AnimatedElement key="debate-awards" delay={index * 100}>
+                <DebateAwardsCard />
+              </AnimatedElement>
+            ) : (
             <AnimatedElement key={index} delay={index * 100}>
               <div className="bg-card/80 backdrop-blur-sm border border-border/60 p-8 rounded-xl hover:-translate-y-2 hover:shadow-xl hover:border-foreground/30 transition-all duration-400 group h-full flex flex-col relative overflow-hidden">
                 <div className="absolute -right-6 -top-6 w-24 h-24 bg-foreground/5 rounded-full blur-2xl group-hover:bg-foreground/10 transition-colors duration-500" />
@@ -231,6 +237,7 @@ function AchievementsSection() {
                 <p className="text-sm text-muted-foreground leading-relaxed flex-1">{item.desc}</p>
               </div>
             </AnimatedElement>
+            )
           ))}
         </div>
       </div>

@@ -68,6 +68,20 @@ export const projects = [
       "I wanted to build something that combined real safety analysis with an internet-native personality. Phishing and scam links are a real problem — especially for students — and a tool people actually enjoy using gets used more often.",
     description:
       "SusorBus accepts URLs, raw HTML, code, emails, plain text, and documents, then runs them through an AI safety analysis that checks for scams, phishing patterns, and malicious content. The verdict comes back instantly in the app's signature bussin-or-sus style — fun on the surface, rigorous underneath."
+  },
+  {
+    slug: "seemyvoice",
+    name: "SeeMyVoice",
+    url: "https://seemyvoice.base44.app",
+    tagline: "Every voice, visible in real time.",
+    preview: "https://s0.wp.com/mshots/v1/https%3A%2F%2Fseemyvoice.base44.app?w=1024&h=640",
+    skills: ["AI Leverage", "Accessibility", "Speech Recognition", "App Development", "Web Fabrication"],
+    summary:
+      "SeeMyVoice is a live speech-to-text app: open it anywhere and every spoken word appears on screen instantly as large, clear captions — built to make conversations, classrooms, and events accessible to Deaf and hard-of-hearing people.",
+    why:
+      "I wanted to build something that could genuinely help people — nobody should miss a conversation just because they can't hear it. SeeMyVoice makes speech visible, in real time, for anyone who needs it.",
+    description:
+      "Live captions transcribe speech the moment it happens, with adjustable text size and color so reading stays comfortable at any distance. It runs right in the browser on any device — no special hardware — so it works in classrooms, meetings, and everyday conversations."
   }
 ];
 

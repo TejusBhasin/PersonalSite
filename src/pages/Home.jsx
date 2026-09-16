@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Phone, Linkedin, Mail, Github, Award, BookOpen, Camera, Trophy, Users, Medal, School, Star } from "lucide-react";
+import { Phone, Linkedin, Mail, Github, Award, BookOpen, Camera, Trophy, Users, Medal, School, Star, Plane, ArrowRight } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import LargeProjectsSection from "@/components/projects/LargeProjectsSection";
 import DebateAwardsCard from "@/components/awards/DebateAwardsCard";
 import useSiteTexts from "@/hooks/useSiteTexts";
 
 const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
-const ICON_MAP = { award: Award, book: BookOpen, camera: Camera, medal: Medal, school: School, star: Star, trophy: Trophy, users: Users };
+const ICON_MAP = { award: Award, book: BookOpen, camera: Camera, medal: Medal, plane: Plane, school: School, star: Star, trophy: Trophy, users: Users };
 
 // --- Utility Components ---
 
@@ -229,14 +230,28 @@ function AchievementsSection({ texts, placards, awards }) {
         <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ${large.length ? "mt-6" : ""}`}>
           {small.map((p, index) => {
             const Icon = ICON_MAP[p.icon] || Trophy;
+            const linked = Boolean(p.link_url);
+            const CardTag = linked ? Link : "div";
             return (
               <AnimatedElement key={p.id} delay={index * 100}>
-                <div className="bg-card/80 backdrop-blur-sm border border-border/60 p-8 rounded-xl hover:-translate-y-2 hover:shadow-xl hover:border-foreground/30 transition-all duration-400 group h-full flex flex-col relative overflow-hidden">
+                <CardTag
+                  {...(linked ? { to: p.link_url } : {})}
+                  className="bg-card/80 backdrop-blur-sm border border-border/60 p-8 rounded-xl hover:-translate-y-2 hover:shadow-xl hover:border-foreground/30 transition-all duration-400 group h-full flex flex-col relative overflow-hidden"
+                >
                   <div className="absolute -right-6 -top-6 w-24 h-24 bg-foreground/5 rounded-full blur-2xl group-hover:bg-foreground/10 transition-colors duration-500" />
                   <Icon className="w-8 h-8 text-foreground/60 mb-5 group-hover:text-foreground group-hover:scale-110 transition-all duration-300" />
                   <h3 className="text-base font-bold text-foreground tracking-wide mb-3" style={MONT}>{p.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed flex-1">{p.description}</p>
-                </div>
+                  {linked && (
+                    <span
+                      className="mt-5 pt-4 border-t border-border/60 w-full inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-foreground/50 group-hover:text-foreground transition-colors duration-300"
+                      style={MONT}
+                    >
+                      See More
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1.5 transition-transform duration-300" />
+                    </span>
+                  )}
+                </CardTag>
               </AnimatedElement>
             );
           })}

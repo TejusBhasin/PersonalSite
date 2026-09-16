@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, ExternalLink, Github } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
@@ -62,16 +62,30 @@ export default function ProjectDetail() {
               {project.tagline}
             </p>
           </div>
-          <a
-            href={project.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 bg-foreground text-background px-6 py-3 rounded-md font-semibold text-sm tracking-wide hover:bg-foreground/80 hover:-translate-y-1 transition-all duration-300 shadow-md hover:shadow-xl shrink-0"
-            style={MONT}
-          >
-            <ExternalLink className="w-4 h-4" />
-            {project.url.replace("https://", "").replace("www.", "")}
-          </a>
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <a
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 bg-foreground text-background px-6 py-3 rounded-md font-semibold text-sm tracking-wide hover:bg-foreground/80 hover:-translate-y-1 transition-all duration-300 shadow-md hover:shadow-xl"
+              style={MONT}
+            >
+              <ExternalLink className="w-4 h-4" />
+              {project.url.replace("https://", "").replace("www.", "")}
+            </a>
+            {project.github_url && (
+              <a
+                href={project.github_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 border border-border bg-card px-6 py-3 rounded-md font-semibold text-sm tracking-wide hover:border-foreground hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-lg"
+                style={MONT}
+              >
+                <Github className="w-4 h-4" />
+                GitHub
+              </a>
+            )}
+          </div>
         </div>
 
         <div className="relative rounded-xl overflow-hidden shadow-2xl border border-border/60 mb-12 group">

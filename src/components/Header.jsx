@@ -63,6 +63,16 @@ export default function Header() {
             LinkedIn
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-foreground transition-all duration-300 group-hover:w-full" />
           </a>
+          <a
+            href="https://github.com/TopGamerTJ-TJ"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-bold tracking-[0.2em] uppercase text-foreground/70 hover:text-foreground transition-colors duration-300 relative group"
+            style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}
+          >
+            GitHub
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-foreground transition-all duration-300 group-hover:w-full" />
+          </a>
         </nav>
 
         {/* Mobile menu */}
@@ -97,6 +107,15 @@ export default function Header() {
                 style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}
               >
                 LinkedIn
+              </a>
+              <a
+                href="https://github.com/TopGamerTJ-TJ"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-2xl font-black tracking-widest uppercase text-foreground/70 hover:text-foreground/70 transition-colors duration-200"
+                style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}
+              >
+                GitHub
               </a>
             </nav>
           </SheetContent>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Phone, Linkedin, Mail, Award, BookOpen, Camera, Trophy, Users, Medal, School, Star } from "lucide-react";
+import { Phone, Linkedin, Mail, Github, Award, BookOpen, Camera, Trophy, Users, Medal, School, Star } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import LargeProjectsSection from "@/components/projects/LargeProjectsSection";
 import DebateAwardsCard from "@/components/awards/DebateAwardsCard";
@@ -149,6 +149,7 @@ function ContactSection({ texts }) {
   const contacts = [
     { icon: Phone, label: texts.contact_label_call, href: "tel:9142676083" },
     { icon: Linkedin, label: texts.contact_label_linkedin, href: "https://www.linkedin.com/in/tejusbhasin/" },
+    { icon: Github, label: "GitHub", href: "https://github.com/TopGamerTJ-TJ" },
     { icon: Mail, label: texts.contact_label_school_email, href: "mailto:tejus_bhasin@horacemann.org" },
     { icon: Mail, label: texts.contact_label_personal_email, href: "mailto:tejusbhasin17@gmail.com" },
   ];
@@ -156,7 +157,7 @@ function ContactSection({ texts }) {
   return (
     <section className="bg-background pb-24 px-6">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
           {contacts.map((item, idx) => (
             <AnimatedElement key={idx} delay={idx * 100}>
               <a
@@ -166,6 +167,7 @@ function ContactSection({ texts }) {
                 className="flex items-center justify-center gap-2 bg-foreground text-background px-6 py-4 rounded-md font-semibold text-sm tracking-wide hover:bg-foreground/80 hover:-translate-y-1 transition-all duration-300 shadow-md hover:shadow-xl group"
                 style={MONT}
               >
+                <item.icon className="w-4 h-4" />
                 {item.label}
               </a>
             </AnimatedElement>

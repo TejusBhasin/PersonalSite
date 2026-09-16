@@ -22,35 +22,48 @@ function ProjectCard({ project, index }) {
   const navigate = useNavigate();
   const openProject = () => navigate(`/project/${project.slug}`);
   const skills = project.skills || [];
+  const host = (() => { try { return new URL(project.url).hostname.replace(/^www\./, ""); } catch { return project.url; } })();
 
   return (
     <div
       className="group bg-card/80 backdrop-blur-sm border border-border/60 rounded-xl overflow-hidden hover:-translate-y-2 hover:shadow-xl hover:border-foreground/30 transition-all duration-400 flex flex-col"
       style={{ animation: `cardReveal 0.8s ease-out ${index * 0.1}s both` }}
     >
-      <a
-        href={project.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="relative block overflow-hidden"
-      >
-        <img
-          src={project.preview}
-          alt={`${project.name} preview`}
-          loading="lazy"
-          decoding="async"
-          className="w-full aspect-[16/10] object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
-        />
-        <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/20 transition-colors duration-300 flex items-center justify-center">
-          <span
-            className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-2 bg-background text-foreground text-xs font-bold tracking-widest uppercase px-4 py-2 rounded-full shadow-lg"
-            style={MONT}
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
-            Open Project
-          </span>
+      {project.embed_url ? (
+        <div className="relative block overflow-hidden bg-card">
+          <iframe
+            src={project.embed_url}
+            title={`${project.name} presentation`}
+            loading="lazy"
+            allow="fullscreen"
+            className="w-full aspect-[16/10]"
+          />
         </div>
-      </a>
+      ) : (
+        <a
+          href={project.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="relative block overflow-hidden"
+        >
+          <img
+            src={project.preview}
+            alt={`${project.name} preview`}
+            loading="lazy"
+            decoding="async"
+            className="w-full aspect-[16/10] object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
+          />
+          <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/20 transition-colors duration-300 flex items-center justify-center">
+            <span
+              className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-2 bg-background text-foreground text-xs font-bold tracking-widest uppercase px-4 py-2 rounded-full shadow-lg"
+              style={MONT}
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              Open Project
+            </span>
+          </div>
+        </a>
+      )}
 
       <div className="p-6 flex flex-col flex-1 cursor-pointer" onClick={openProject}>
         <div className="flex items-start justify-between gap-3 mb-2">
@@ -73,7 +86,7 @@ function ProjectCard({ project, index }) {
               className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground"
               style={MONT}
             >
-              {project.url.replace("https://", "").replace("www.", "")}
+              {host}
             </span>
           </div>
         </div>

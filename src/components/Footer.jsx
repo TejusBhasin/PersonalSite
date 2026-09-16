@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Phone, Mail, Linkedin, Download, Settings, Github, Link2 } from "lucide-react";
+import { Phone, Mail, Linkedin, Download, Github, Link2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import useSiteTexts from "@/hooks/useSiteTexts";
 
@@ -108,14 +107,6 @@ export default function Footer() {
             <Download className="w-3.5 h-3.5" />
             Save My Contact
           </a>
-          <Link
-            to="/manage"
-            className="flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase text-background/40 hover:text-background transition-colors duration-200"
-            style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}
-          >
-            <Settings className="w-3.5 h-3.5" />
-            Edit Content
-          </Link>
         </div>
       </div>
     </footer>

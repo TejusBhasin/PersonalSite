@@ -10,7 +10,6 @@ import Register from './pages/Register';
 import Home from './pages/Home';
 import Layout from './components/Layout';
 import ProjectDetail from './pages/ProjectDetail';
-import Manage from './pages/Manage';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -37,7 +36,6 @@ const AuthenticatedApp = () => {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/manage" element={<Manage />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/Register" element={<Register />} />
         {/* Add your page Route elements here */}

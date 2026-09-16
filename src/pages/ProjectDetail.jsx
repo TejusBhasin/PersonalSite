@@ -5,6 +5,10 @@ import { base44 } from "@/api/base44Client";
 
 const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
 
+const hostOf = (u) => {
+  try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return u; }
+};
+
 export default function ProjectDetail() {
   const { slug } = useParams();
   const [project, setProject] = useState(undefined); // undefined = loading, null = not found
@@ -71,7 +75,7 @@ export default function ProjectDetail() {
               style={MONT}
             >
               <ExternalLink className="w-4 h-4" />
-              {project.url.replace("https://", "").replace("www.", "")}
+              {hostOf(project.url)}
             </a>
             {project.github_url && (
               <a
@@ -89,14 +93,30 @@ export default function ProjectDetail() {
         </div>
 
         {project.embed_url ? (
-          <div className="rounded-xl overflow-hidden shadow-2xl border border-border/60 mb-12 bg-card">
-            <iframe
-              src={project.embed_url}
-              title={`${project.name} presentation`}
-              loading="lazy"
-              allow="fullscreen"
-              className="w-full aspect-video"
-            />
+          <div className="mb-12">
+            <div
+              className="rounded-xl overflow-hidden border border-border/60 mb-3 bg-card"
+              style={{ boxShadow: "0 2px 8px 0 rgba(63,69,81,0.16)" }}
+            >
+              <iframe
+                src={project.embed_url}
+                title={`${project.name} presentation`}
+                loading="lazy"
+                allow="fullscreen"
+                className="w-full aspect-video"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground tracking-wide" style={MONT}>
+              <a
+                href={project.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold text-foreground/70 hover:text-foreground underline underline-offset-4 transition-colors"
+              >
+                {project.name}
+              </a>{" "}
+              by Tejus Bhasin — open the full deck
+            </p>
           </div>
         ) : (
           <div className="relative rounded-xl overflow-hidden shadow-2xl border border-border/60 mb-12 group">

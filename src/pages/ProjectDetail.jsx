@@ -88,9 +88,21 @@ export default function ProjectDetail() {
           </div>
         </div>
 
-        <div className="relative rounded-xl overflow-hidden shadow-2xl border border-border/60 mb-12 group">
-          <img src={project.preview} alt={`${project.name} preview`} loading="lazy" decoding="async" className="w-full object-cover" />
-        </div>
+        {project.embed_url ? (
+          <div className="rounded-xl overflow-hidden shadow-2xl border border-border/60 mb-12 bg-card">
+            <iframe
+              src={project.embed_url}
+              title={`${project.name} presentation`}
+              loading="lazy"
+              allow="fullscreen"
+              className="w-full aspect-video"
+            />
+          </div>
+        ) : (
+          <div className="relative rounded-xl overflow-hidden shadow-2xl border border-border/60 mb-12 group">
+            <img src={project.preview} alt={`${project.name} preview`} loading="lazy" decoding="async" className="w-full object-cover" />
+          </div>
+        )}
 
         <div className="flex flex-wrap gap-3 justify-start mb-12">
           {(project.skills || []).map((skill) => (

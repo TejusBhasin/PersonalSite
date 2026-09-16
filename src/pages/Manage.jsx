@@ -9,8 +9,9 @@ const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
 
 const PROJECT_FIELDS = [
   { key: "name", label: "Name", type: "text" },
-  { key: "url", label: "Live URL", type: "text" },
+  { key: "url", label: "Project Link (any URL)", type: "text" },
   { key: "github_url", label: "GitHub URL (optional)", type: "text" },
+  { key: "embed_url", label: "Embed URL (slide deck/video shown on project page, optional)", type: "text" },
   { key: "tagline", label: "Tagline", type: "text" },
   { key: "skills", label: "Skills (comma separated)", type: "list" },
   { key: "summary", label: "What it does", type: "textarea" },

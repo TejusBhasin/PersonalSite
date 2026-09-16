@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ExternalLink, ArrowRight } from "lucide-react";
+import { ExternalLink, ArrowRight, Github } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
@@ -47,7 +47,7 @@ function ProjectCard({ project, index }) {
             style={MONT}
           >
             <ExternalLink className="w-3.5 h-3.5" />
-            Visit Live Site
+            Open Project
           </span>
         </div>
       </a>
@@ -57,12 +57,25 @@ function ProjectCard({ project, index }) {
           <h3 className="text-base font-bold text-foreground tracking-wide" style={MONT}>
             {project.name}
           </h3>
-          <span
-            className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground shrink-0 pt-1"
-            style={MONT}
-          >
-            {project.url.replace("https://", "").replace("www.", "")}
-          </span>
+          <div className="flex items-center gap-2 shrink-0 pt-1">
+            {project.github_url && (
+              <a
+                href={project.github_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${project.name} on GitHub`}
+                className="text-muted-foreground hover:text-foreground transition-colors duration-200"
+              >
+                <Github className="w-4 h-4" />
+              </a>
+            )}
+            <span
+              className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground"
+              style={MONT}
+            >
+              {project.url.replace("https://", "").replace("www.", "")}
+            </span>
+          </div>
         </div>
         <p className="text-sm text-muted-foreground leading-relaxed mb-5 flex-1">{project.tagline}</p>
 

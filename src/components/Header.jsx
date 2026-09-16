@@ -64,7 +64,7 @@ export default function Header() {
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-foreground transition-all duration-300 group-hover:w-full" />
           </a>
           <a
-            href="https://github.com/TopGamerTJ-TJ"
+            href="https://github.com/TejusBhasin"
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs font-bold tracking-[0.2em] uppercase text-foreground/70 hover:text-foreground transition-colors duration-300 relative group"
@@ -109,7 +109,7 @@ export default function Header() {
                 LinkedIn
               </a>
               <a
-                href="https://github.com/TopGamerTJ-TJ"
+                href="https://github.com/TejusBhasin"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-2xl font-black tracking-widest uppercase text-foreground/70 hover:text-foreground/70 transition-colors duration-200"

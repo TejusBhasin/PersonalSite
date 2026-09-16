@@ -149,7 +149,7 @@ function ContactSection({ texts }) {
   const contacts = [
     { icon: Phone, label: texts.contact_label_call, href: "tel:9142676083" },
     { icon: Linkedin, label: texts.contact_label_linkedin, href: "https://www.linkedin.com/in/tejusbhasin/" },
-    { icon: Github, label: "GitHub", href: "https://github.com/TopGamerTJ-TJ" },
+    { icon: Github, label: "GitHub", href: "https://github.com/TejusBhasin" },
     { icon: Mail, label: texts.contact_label_school_email, href: "mailto:tejus_bhasin@horacemann.org" },
     { icon: Mail, label: texts.contact_label_personal_email, href: "mailto:tejusbhasin17@gmail.com" },
   ];

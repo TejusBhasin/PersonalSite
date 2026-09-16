@@ -29,6 +29,14 @@ const PLACARD_FIELDS = [
   { key: "visible", label: "Visible", type: "boolean" },
 ];
 
+const LINK_FIELDS = [
+  { key: "label", label: "Label", type: "text" },
+  { key: "url", label: "URL", type: "text" },
+  { key: "icon", label: "Icon", type: "select", options: ["link", "github", "linkedin", "mail", "phone", "download"] },
+  { key: "sort_order", label: "Order", type: "number" },
+  { key: "visible", label: "Visible", type: "boolean" },
+];
+
 const AWARD_FIELDS = [
   { key: "title", label: "Title", type: "text" },
   { key: "issuer", label: "Issued by", type: "text" },
@@ -85,6 +93,7 @@ export default function Manage() {
           <TabsTrigger value="projects">Projects</TabsTrigger>
           <TabsTrigger value="placards">Placards</TabsTrigger>
           <TabsTrigger value="awards">Debate Awards</TabsTrigger>
+          <TabsTrigger value="links">Links</TabsTrigger>
         </TabsList>
         <TabsContent value="text" className="mt-6">
           <TextEditor />
@@ -111,6 +120,14 @@ export default function Manage() {
             fields={AWARD_FIELDS}
             defaults={{ issuer: "NYCUDL", association: "Horace Mann School", visible: true, sort_order: 99 }}
             addLabel="Add Award"
+          />
+        </TabsContent>
+        <TabsContent value="links" className="mt-6">
+          <RecordManager
+            entityName="SiteLink"
+            fields={LINK_FIELDS}
+            defaults={{ icon: "link", visible: true, sort_order: 99 }}
+            addLabel="Add Link"
           />
         </TabsContent>
       </Tabs>

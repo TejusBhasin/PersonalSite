@@ -1,9 +1,21 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Phone, Mail, Linkedin, Download, Settings } from "lucide-react";
+import { Phone, Mail, Linkedin, Download, Settings, Github, Link2 } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 import useSiteTexts from "@/hooks/useSiteTexts";
+
+const LINK_ICONS = { link: Link2, github: Github, linkedin: Linkedin, mail: Mail, phone: Phone, download: Download };
 
 export default function Footer() {
   const texts = useSiteTexts();
+  const [links, setLinks] = useState([]);
+
+  useEffect(() => {
+    base44.entities.SiteLink.list("sort_order", 100)
+      .then((rows) => setLinks(rows.filter((r) => r.visible !== false)))
+      .catch(() => setLinks([]));
+  }, []);
+
   return (
     <footer className="bg-foreground text-background py-10 px-6 border-t border-border">
       <div className="max-w-7xl mx-auto">
@@ -60,6 +72,22 @@ export default function Footer() {
               <Mail className="w-3.5 h-3.5" />
               Personal Email
             </a>
+            {links.map((l) => {
+              const Icon = LINK_ICONS[l.icon] || Link2;
+              return (
+                <a
+                  key={l.id}
+                  href={l.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-background/70 hover:text-background transition-colors duration-200"
+                  style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {l.label}
+                </a>
+              );
+            })}
           </div>
         </div>
 

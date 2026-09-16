@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Sheet, SheetTrigger, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import useSiteTexts from "@/hooks/useSiteTexts";
 import { Button } from "@/components/ui/button";
 
 export default function Header() {
+  const texts = useSiteTexts();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -30,7 +32,7 @@ export default function Header() {
           className="font-black text-lg tracking-widest text-foreground hover:text-foreground/70 transition-colors duration-300 uppercase"
           style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}
         >
-          Tejus Bhasin
+          {texts?.brand_name ?? "Tejus Bhasin"}
         </Link>
 
         {/* Desktop nav */}

@@ -1,6 +1,9 @@
-import { Phone, Mail, Linkedin, Download } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Phone, Mail, Linkedin, Download, Settings } from "lucide-react";
+import useSiteTexts from "@/hooks/useSiteTexts";
 
 export default function Footer() {
+  const texts = useSiteTexts();
   return (
     <footer className="bg-foreground text-background py-10 px-6 border-t border-border">
       <div className="max-w-7xl mx-auto">
@@ -11,13 +14,13 @@ export default function Footer() {
               className="text-lg font-black tracking-widest uppercase text-background mb-1"
               style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}
             >
-              Tejus Bhasin
+              {texts?.brand_name ?? "Tejus Bhasin"}
             </p>
             <p
               className="text-xs tracking-widest uppercase text-background/60"
               style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}
             >
-              Horace Mann School · Class of 2032
+              {texts?.brand_status ?? "Horace Mann School · Class of 2032"}
             </p>
           </div>
 
@@ -77,6 +80,14 @@ export default function Footer() {
             <Download className="w-3.5 h-3.5" />
             Save My Contact
           </a>
+          <Link
+            to="/manage"
+            className="flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase text-background/40 hover:text-background transition-colors duration-200"
+            style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}
+          >
+            <Settings className="w-3.5 h-3.5" />
+            Edit Content
+          </Link>
         </div>
       </div>
     </footer>

@@ -3,40 +3,7 @@ import { Trophy, School, ChevronDown } from "lucide-react";
 
 const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
 
-const DEBATE_AWARDS = [
-  {
-    title: "NYCUDL Top Team Award",
-    date: "Mar 2026",
-    desc: "On March 7th, 2026, I got a Top Team award for parliamentary debate at an open league NYCUDL debate. My team of 3 people came 6th out of 140 teams.",
-  },
-  {
-    title: "NYCUDL Top Team Award",
-    date: "Feb 2026",
-    desc: "On February 7th, 2026, I got a Top Team award for parliamentary debate at an open league NYCUDL debate. My team of 3 people came 1st out of approx 100-130 teams.",
-  },
-  {
-    title: "NYCUDL Personal Speaker Points Award",
-    date: "Feb 2026",
-    desc: "On February 7th, 2026, I got a Personal Speaker Points award for parliamentary debate at an open league NYCUDL debate. I came 3rd out of roughly 250 people.",
-  },
-  {
-    title: "NYCUDL Top Team Award",
-    date: "Jan 2026",
-    desc: "On January 10th, 2026, I got a Top Team award for parliamentary debate at an open league NYCUDL debate. My team of 3 people came 4th out of approx 100-120 teams.",
-  },
-  {
-    title: "NYCUDL Top Team Award",
-    date: "Nov 2025",
-    desc: "On November 20th, 2025, I got a Top Team award for parliamentary debate at an open league NYCUDL debate. My team of 3 people came 9th out of approx 80-100 teams.",
-  },
-  {
-    title: "NYCUDL Personal Speaker Points Award",
-    date: "Nov 2025",
-    desc: "On November 20th, 2025, I got a Personal Speaker Points award for parliamentary debate at an open league NYCUDL debate. I came 9th out of roughly 250 people.",
-  },
-];
-
-export default function DebateAwardsCard() {
+export default function DebateAwardsCard({ awards = [] }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -53,7 +20,7 @@ export default function DebateAwardsCard() {
 
       <button
         onClick={() => setOpen(!open)}
-        className="mt-5 pt-4 border-t border-border/60 w-full inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-foreground/50 group-hover:text-foreground group-hover:cursor-pointer transition-colors duration-300 cursor-pointer"
+        className="mt-5 pt-4 border-t border-border/60 w-full inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-foreground/50 group-hover:text-foreground transition-colors duration-300 cursor-pointer"
         style={MONT}
       >
         {open ? "Show Less" : "Show More"}
@@ -63,34 +30,24 @@ export default function DebateAwardsCard() {
       </button>
 
       {open && (
-        <div className="mt-5">
-          {/* National ranking placard */}
-          <div className="flex items-center gap-3 bg-foreground text-background rounded-lg px-4 py-3">
-            <Trophy className="w-5 h-5 shrink-0" />
-            <div>
-              <p className="text-sm font-bold" style={MONT}>
-                Ranked 4th Place Nationally in Critical Thinking
+        <div className="mt-1">
+          {awards.map((award) => (
+            <div key={award.id} className="py-4 border-b border-border/60 last:border-b-0">
+              <p className="text-sm font-bold text-foreground" style={MONT}>
+                {award.title}
               </p>
-              <p className="text-xs text-background/70 mt-0.5">National ranking · Critical Thinking</p>
-            </div>
-          </div>
-
-          {/* Award entries */}
-          <div className="mt-1">
-            {DEBATE_AWARDS.map((award, index) => (
-              <div key={index} className="py-4 border-b border-border/60 last:border-b-0">
-                <p className="text-sm font-bold text-foreground" style={MONT}>
-                  {award.title}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">Issued by NYCUDL · {award.date}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {[award.issuer ? `Issued by ${award.issuer}` : null, award.issued_date].filter(Boolean).join(" · ")}
+              </p>
+              {award.association && (
                 <p className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
                   <School className="w-3 h-3 shrink-0" />
-                  Associated with Horace Mann School
+                  Associated with {award.association}
                 </p>
-                <p className="text-xs text-foreground/70 leading-relaxed mt-2">{award.desc}</p>
-              </div>
-            ))}
-          </div>
+              )}
+              <p className="text-xs text-foreground/70 leading-relaxed mt-2">{award.description}</p>
+            </div>
+          ))}
         </div>
       )}
     </div>

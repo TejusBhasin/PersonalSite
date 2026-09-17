@@ -11,6 +11,7 @@ import Home from './pages/Home';
 import Layout from './components/Layout';
 import ProjectDetail from './pages/ProjectDetail';
 import PhotoAlbum from './pages/PhotoAlbum';
+import Games from './pages/Games';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -38,6 +39,7 @@ const AuthenticatedApp = () => {
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/photo-album" element={<PhotoAlbum />} />
+        <Route path="/games" element={<Games />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/Register" element={<Register />} />
         {/* Add your page Route elements here */}

@@ -68,6 +68,28 @@
 body { font-family: var(--font-body) !important; }
 h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading) !important; }
 
+/* Content protection: no text selection, no image dragging */
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+input, textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+img { -webkit-user-drag: none; }
+
+/* Blur the page while unfocused or during PrintScreen */
+body.guard-blur #root {
+  filter: blur(14px);
+  transition: filter 0.1s ease-out;
+}
+
 
 
 @keyframes floatA {

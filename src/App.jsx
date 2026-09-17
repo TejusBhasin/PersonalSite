@@ -16,6 +16,7 @@ import PlayGame from './pages/PlayGame';
 import Visits from './pages/Visits';
 import VisitTracker from './components/VisitTracker';
 import SiteGate from './components/SiteGate';
+import ContentGuard from './components/ContentGuard';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -42,6 +43,7 @@ const AuthenticatedApp = () => {
     <>
     <VisitTracker />
     <SiteGate>
+    <ContentGuard />
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />

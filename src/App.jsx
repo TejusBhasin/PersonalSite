@@ -15,7 +15,6 @@ import Games from './pages/Games';
 import PlayGame from './pages/PlayGame';
 import Visits from './pages/Visits';
 import VisitTracker from './components/VisitTracker';
-import SiteGate from './components/SiteGate';
 import ContentGuard from './components/ContentGuard';
 // Add page imports here
 
@@ -42,7 +41,6 @@ const AuthenticatedApp = () => {
   return (
     <>
     <VisitTracker />
-    <SiteGate>
     <ContentGuard />
     <Routes>
       <Route element={<Layout />}>
@@ -58,7 +56,6 @@ const AuthenticatedApp = () => {
       <Route path="/gamesthatonlytejushas/:slug" element={<PlayGame />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
-    </SiteGate>
     </>
   );
 };

@@ -57,7 +57,8 @@ export default function Visits() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-foreground text-background text-left" style={MONT}>
-                    <th className="px-4 py-3 font-bold tracking-wide text-xs uppercase">When</th>
+                    <th className="px-4 py-3 font-bold tracking-wide text-xs uppercase">Date</th>
+                    <th className="px-4 py-3 font-bold tracking-wide text-xs uppercase">Time</th>
                     <th className="px-4 py-3 font-bold tracking-wide text-xs uppercase">IP Address</th>
                     <th className="px-4 py-3 font-bold tracking-wide text-xs uppercase">Page</th>
                     <th className="px-4 py-3 font-bold tracking-wide text-xs uppercase">Browser</th>
@@ -67,7 +68,10 @@ export default function Visits() {
                   {visits.map((v) => (
                     <tr key={v.id} className="border-t border-border/60 odd:bg-card/50">
                       <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">
-                        {new Date(v.created_date).toLocaleString()}
+                        {new Date(v.created_date).toLocaleDateString()}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">
+                        {new Date(v.created_date).toLocaleTimeString()}
                       </td>
                       <td className="px-4 py-3 font-semibold text-foreground">{v.ip}</td>
                       <td className="px-4 py-3 text-muted-foreground">{v.path}</td>

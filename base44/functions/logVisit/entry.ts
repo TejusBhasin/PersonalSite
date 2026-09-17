@@ -16,12 +16,17 @@ export default async function(req) {
     const userAgent = req.headers.get("user-agent") || "";
 
     const base44 = createClientFromRequest(req);
+
+    // Is this visitor's IP on the banned list?
+    const banned = await base44.asServiceRole.entities.Banned.filter({ ip: ip });
+
     await base44.asServiceRole.entities.VisitLog.create({
       ip: ip,
       path: path || "/",
       user_agent: userAgent
     });
-    return Response.json({ ok: true });
+
+    return Response.json({ ok: true, banned: banned.length > 0 });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }

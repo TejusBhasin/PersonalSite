@@ -4,11 +4,12 @@
   "properties": {
     "ip": {
       "type": "string"
+    },
+    "device_id": {
+      "type": "string"
     }
   },
-  "required": [
-    "ip"
-  ],
+  "required": [],
   "rls": {
     "read": {
       "user_condition": {

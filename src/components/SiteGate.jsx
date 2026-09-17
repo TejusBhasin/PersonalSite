@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Lock, X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { getDeviceId } from "@/lib/deviceId";
 
 const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
 
@@ -16,7 +17,10 @@ export default function SiteGate({ children }) {
     setChecking(true);
     setError(null);
     try {
-      const res = await base44.functions.invoke("checkSitePassword", { password });
+      const res = await base44.functions.invoke("checkSitePassword", {
+        password,
+        device_id: getDeviceId(),
+      });
       if (res?.banned || res?.data?.banned) {
         setBlocked(true);
       } else if (res?.ok || res?.data?.ok) {

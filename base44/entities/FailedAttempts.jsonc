@@ -2,7 +2,7 @@
   "name": "FailedAttempts",
   "type": "object",
   "properties": {
-    "ip": {
+    "device_id": {
       "type": "string"
     },
     "count": {
@@ -11,7 +11,7 @@
     }
   },
   "required": [
-    "ip"
+    "device_id"
   ],
   "rls": {
     "read": {

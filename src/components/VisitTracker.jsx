@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { getDeviceId } from "@/lib/deviceId";
 
 export default function VisitTracker() {
   const location = useLocation();
   const [banned, setBanned] = useState(false);
 
   useEffect(() => {
-    base44.functions.invoke("logVisit", { path: location.pathname })
+    base44.functions.invoke("logVisit", { path: location.pathname, device_id: getDeviceId() })
       .then((res) => {
         if (res?.banned || res?.data?.banned) setBanned(true);
       })

@@ -5,6 +5,9 @@
     "ip": {
       "type": "string"
     },
+    "device_id": {
+      "type": "string"
+    },
     "path": {
       "type": "string"
     },

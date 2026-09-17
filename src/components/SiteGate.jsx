@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Lock } from "lucide-react";
+import { Lock, X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
@@ -9,6 +9,7 @@ export default function SiteGate({ children }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [checking, setChecking] = useState(false);
+  const [blocked, setBlocked] = useState(false);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -16,11 +17,19 @@ export default function SiteGate({ children }) {
     setError(null);
     try {
       const res = await base44.functions.invoke("checkSitePassword", { password });
-      if (res?.ok || res?.data?.ok) {
+      if (res?.banned || res?.data?.banned) {
+        setBlocked(true);
+      } else if (res?.ok || res?.data?.ok) {
         localStorage.setItem("site_unlocked", "yes");
         setUnlocked(true);
       } else {
-        setError("Incorrect password.");
+        const left = res?.attempts_left ?? res?.data?.attempts_left;
+        setError(
+          typeof left === "number"
+            ? `Incorrect password. ${left} attempt${left === 1 ? "" : "s"} left before this device is permanently blocked.`
+            : "Incorrect password."
+        );
+        setPassword("");
       }
     } catch {
       setError("Something went wrong. Please try again.");
@@ -28,6 +37,14 @@ export default function SiteGate({ children }) {
       setChecking(false);
     }
   };
+
+  if (blocked) {
+    return (
+      <div className="fixed inset-0 z-[9998] bg-background flex items-center justify-center px-6">
+        <X className="w-32 h-32 text-red-600" strokeWidth={4} />
+      </div>
+    );
+  }
 
   if (unlocked) return children;
 

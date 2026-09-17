@@ -84,12 +84,6 @@ input, textarea {
 
 img { -webkit-user-drag: none; }
 
-/* Blur the page while unfocused or during PrintScreen */
-body.guard-blur #root {
-  filter: blur(14px);
-  transition: filter 0.1s ease-out;
-}
-
 
 
 @keyframes floatA {

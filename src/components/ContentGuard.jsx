@@ -20,16 +20,7 @@ export default function ContentGuard() {
       if (e.key === "PrintScreen" || e.code === "PrintScreen") {
         // Overwrite the clipboard so the captured shot can't be pasted.
         try { navigator.clipboard?.writeText(""); } catch { /* no clipboard access */ }
-        document.body.classList.add("guard-blur");
-        setTimeout(() => document.body.classList.remove("guard-blur"), 1500);
       }
-    };
-
-    // Blur content while the window is unfocused or hidden (snipping tools, alt-tab).
-    const onBlur = () => document.body.classList.add("guard-blur");
-    const onFocus = () => document.body.classList.remove("guard-blur");
-    const onVisibility = () => {
-      document.body.classList.toggle("guard-blur", document.hidden);
     };
 
     document.addEventListener("contextmenu", onContextMenu);
@@ -37,9 +28,6 @@ export default function ContentGuard() {
     document.addEventListener("cut", onCopyCut);
     document.addEventListener("dragstart", onDragStart);
     document.addEventListener("keydown", onKeyDown, true);
-    window.addEventListener("blur", onBlur);
-    window.addEventListener("focus", onFocus);
-    document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
       document.removeEventListener("contextmenu", onContextMenu);
@@ -47,10 +35,6 @@ export default function ContentGuard() {
       document.removeEventListener("cut", onCopyCut);
       document.removeEventListener("dragstart", onDragStart);
       document.removeEventListener("keydown", onKeyDown, true);
-      window.removeEventListener("blur", onBlur);
-      window.removeEventListener("focus", onFocus);
-      document.removeEventListener("visibilitychange", onVisibility);
-      document.body.classList.remove("guard-blur");
     };
   }, []);
 

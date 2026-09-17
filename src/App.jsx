@@ -12,6 +12,7 @@ import Layout from './components/Layout';
 import ProjectDetail from './pages/ProjectDetail';
 import PhotoAlbum from './pages/PhotoAlbum';
 import Games from './pages/Games';
+import PlayGame from './pages/PlayGame';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -45,6 +46,7 @@ const AuthenticatedApp = () => {
         {/* Add your page Route elements here */}
       </Route>
       <Route path="/project/:slug" element={<ProjectDetail />} />
+      <Route path="/games/:slug" element={<PlayGame />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

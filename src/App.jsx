@@ -13,6 +13,8 @@ import ProjectDetail from './pages/ProjectDetail';
 import PhotoAlbum from './pages/PhotoAlbum';
 import Games from './pages/Games';
 import PlayGame from './pages/PlayGame';
+import Visits from './pages/Visits';
+import VisitTracker from './components/VisitTracker';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -36,19 +38,23 @@ const AuthenticatedApp = () => {
   }
 
   return (
+    <>
+    <VisitTracker />
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/photo-album" element={<PhotoAlbum />} />
-        <Route path="/games" element={<Games />} />
+        <Route path="/visits" element={<Visits />} />
+        <Route path="/gamesthatonlytejushas" element={<Games />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/Register" element={<Register />} />
         {/* Add your page Route elements here */}
       </Route>
       <Route path="/project/:slug" element={<ProjectDetail />} />
-      <Route path="/games/:slug" element={<PlayGame />} />
+      <Route path="/gamesthatonlytejushas/:slug" element={<PlayGame />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
+    </>
   );
 };
 

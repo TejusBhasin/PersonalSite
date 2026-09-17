@@ -1,35 +1,37 @@
 export const GAME_SLUGS = [
-  "2048", "8bit-quest", "agar", "apex-predator", "arcade-classic", "arcade-fever",
-  "asteroids", "aurora-burst", "aurora-dance", "binary-blast", "block-squad",
-  "bounce-palace", "breakout", "brick-blaster", "bullet-hell", "cartridge-dash",
-  "cassette-quest", "chain-reaction", "chip-tune-battle", "chrono-jump",
-  "cipher-crack", "code-runner", "color-match", "combo-master", "crystal-dash",
-  "crystal-fusion", "cyber-breach", "cyber-rush", "data-surge", "digital-maze",
-  "earth-digger", "earthquake-survival", "echo-sync", "eclipse-runner",
-  "fast-reflex", "flappy-fall", "flappy", "flow-state", "forest-guardian",
-  "frogger", "frost-maze", "gravity-ball", "hanoi", "hexagon-defense",
-  "inferno-dash", "infinity-burst", "jump-quest", "laser-defender", "laser-grid",
-  "lightning-strike", "logic-gate", "marble-run", "math-marathon",
-  "matrix-trace", "memory", "meteor-strike", "minesweeper", "minimalist-zen",
-  "nature-collector", "nebula-collector", "neon-portal", "neon-surge",
-  "nexus-blocks", "nexus-painter", "nova-strike", "ocean-explorer",
-  "orbit-defender", "pacman", "phantom-path", "ping-pong-2p", "pixel-blast",
-  "pixel-painter", "pixel-perfect", "plasma-collector", "pong", "prism-match",
-  "pulse-beat", "pulse-runner", "puzzle-match", "quake-runner", "quantum-sync",
-  "quick-tap", "resonance-grid", "retro-racer", "rhythm-master", "rhythm-tap",
-  "riddle-realm", "rotator", "sequence-solver", "shadow-dash", "simon",
-  "sky-flyer", "snake", "sokoban", "solar-flare", "space-invaders",
-  "space-maze", "spectrum-runner", "surge-defender", "synth-wave",
-  "tempest-surge", "tetris", "tidal-wave", "time-racer", "titan-clash",
-  "tornado-vortex", "tsunami-escape", "vaporwave-escape", "velocity-zero",
-  "void-collector", "void-escape", "void-jumper", "volcanic-eruption",
-  "whack-a-mole"
+  "2048", "adarkroom", "asciispace", "asteroids", "astray", "backcountry",
+  "blackholesquare", "bounceback", "breaklock", "breakout", "captaincallisto",
+  "chess", "chromaincident", "chromedino", "connect3", "cookieclicker",
+  "edgenotfound", "evilglitch", "factoryballsforever", "flappybird",
+  "geometrydash", "hextris", "konnekt", "minecraft", "ninjavsevilcorp",
+  "packabunchas", "pacman", "particleclicker", "pushback", "q1k3", "racer",
+  "radiusraid", "retrohaunt", "roadblocks", "run3", "shuttledeck",
+  "sleepingbeauty", "snake", "spacecompany", "spacegarden", "spacehuggers",
+  "tetris", "themazeofspacegoblins", "towermaster", "trimps", "underrun",
+  "xx142-b2exe"
 ];
 
+const NAME_OVERRIDES = {
+  "adarkroom": "A Dark Room",
+  "chromedino": "Chrome Dino",
+  "flappybird": "Flappy Bird",
+  "geometrydash": "Geometry Dash",
+  "cookieclicker": "Cookie Clicker",
+  "pacman": "Pac-Man",
+  "run3": "Run 3",
+  "themazeofspacegoblins": "The Maze of Space Goblins",
+  "xx142-b2exe": "XX142-B2EXE",
+  "captaincallisto": "Captain Callisto",
+  "ninjavsevilcorp": "Ninja vs Evil Corp",
+  "factoryballsforever": "Factory Balls Forever",
+  "chromaincident": "Chroma Incident"
+};
+
 export const prettify = (slug) =>
+  NAME_OVERRIDES[slug] ||
   slug.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 
 export const GAMES = GAME_SLUGS.map((slug) => ({ slug, name: prettify(slug) }));
 
-// Served through the app's own backend function so the HTML renders as a page, not code.
+// Served through the app's own backend function so the game renders playable on the site.
 export const gameEmbedUrl = (slug) => `/functions/serveGame?slug=${slug}`;

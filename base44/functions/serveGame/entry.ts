@@ -1,4 +1,4 @@
-const RAW_BASE = "https://raw.githubusercontent.com/prateek121/90s-games/main/games/";
+const GAMES_BASE = "https://rawcdn.githack.com/BinBashBanana/gfiles/master/gfiles/html5/";
 
 export default async function(req) {
   try {
@@ -14,15 +14,11 @@ export default async function(req) {
     if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
       return Response.json({ error: "Invalid game slug" }, { status: 400 });
     }
-    const upstream = await fetch(RAW_BASE + slug + ".html");
-    if (!upstream.ok) {
-      return Response.json({ error: "Game not found" }, { status: 404 });
-    }
-    const html = await upstream.text();
-    return new Response(html, {
-      status: 200,
+    // Redirect to the game's own page so it (and its assets) render playable, not as code.
+    return new Response(null, {
+      status: 302,
       headers: {
-        "Content-Type": "text/html; charset=utf-8",
+        Location: GAMES_BASE + slug + "/index.html",
         "Cache-Control": "public, max-age=3600"
       }
     });

@@ -29,7 +29,7 @@ export default function PlayGame() {
     <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
       <div className="flex items-center justify-between gap-4 px-4 sm:px-6 py-3 border-b border-border shrink-0">
         <Link
-          to="/games"
+          to="/gamesthatonlytejushas"
           className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.2em] uppercase text-foreground/60 hover:text-foreground transition-colors duration-300"
           style={MONT}
         >

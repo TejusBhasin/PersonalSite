@@ -54,7 +54,7 @@ export default function Games() {
             {filtered.map((game) => (
               <Link
                 key={game.slug}
-                to={`/games/${game.slug}`}
+                to={`/gamesthatonlytejushas/${game.slug}`}
                 className="group bg-card/80 backdrop-blur-sm border border-border/60 rounded-xl px-5 py-4 flex items-center justify-between gap-3 hover:-translate-y-1 hover:shadow-lg hover:border-foreground/30 hover:bg-card transition-all duration-300"
               >
                 <Gamepad2 className="w-5 h-5 shrink-0 text-foreground/50 group-hover:text-foreground transition-colors" />

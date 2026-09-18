@@ -34,6 +34,23 @@ export default async function(req) {
       user_agent: userAgent
     });
 
+    // Keep a record of every device that has visited the site.
+    if (deviceId) {
+      const existing = await base44.asServiceRole.entities.Device.filter({ device_id: deviceId });
+      if (existing.length > 0) {
+        await base44.asServiceRole.entities.Device.update(existing[0].id, {
+          ip: ip,
+          user_agent: userAgent
+        });
+      } else {
+        await base44.asServiceRole.entities.Device.create({
+          device_id: deviceId,
+          ip: ip,
+          user_agent: userAgent
+        });
+      }
+    }
+
     return Response.json({ ok: true, banned: banned });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });

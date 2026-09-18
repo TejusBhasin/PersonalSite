@@ -1,18 +1,23 @@
 {
-  "name": "Banned",
+  "name": "Device",
   "type": "object",
   "properties": {
+    "device_id": {
+      "type": "string"
+    },
     "ip": {
       "type": "string"
     },
-    "device_id": {
+    "user_agent": {
       "type": "string"
     },
     "notes": {
       "type": "string"
     }
   },
-  "required": [],
+  "required": [
+    "device_id"
+  ],
   "rls": {
     "read": {
       "user_condition": {

@@ -3,10 +3,16 @@
   "type": "object",
   "properties": {
     "ip": {
-      "type": "string"
+      "type": "string",
+      "description": "Exact IP to block"
     },
     "device_id": {
-      "type": "string"
+      "type": "string",
+      "description": "Device to block"
+    },
+    "cidr": {
+      "type": "string",
+      "description": "IP range to block, e.g. 192.168.1.0/24 blocks a whole WiFi network"
     },
     "notes": {
       "type": "string"

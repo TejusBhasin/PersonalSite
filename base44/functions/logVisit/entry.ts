@@ -1,5 +1,23 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
 
+const ipToInt = (s) => {
+  const m = String(s).match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (!m) return null;
+  return (((+m[1] << 24) | (+m[2] << 16) | (+m[3] << 8)) | +m[4]) >>> 0;
+};
+
+// Checks whether an IP falls inside a CIDR range like "192.168.1.0/24".
+const cidrMatch = (ip, cidr) => {
+  const [base, bitsStr] = String(cidr).split("/");
+  const bits = parseInt(bitsStr ?? "32", 10);
+  if (Number.isNaN(bits) || bits < 0 || bits > 32) return false;
+  const ipInt = ipToInt(ip);
+  const baseInt = ipToInt(base);
+  if (ipInt === null || baseInt === null) return false;
+  const mask = bits === 0 ? 0 : (0xFFFFFFFF << (32 - bits)) >>> 0;
+  return (ipInt & mask) === (baseInt & mask);
+};
+
 export default async function(req) {
   try {
     let path = null;
@@ -19,13 +37,13 @@ export default async function(req) {
 
     const base44 = createClientFromRequest(req);
 
-    // Is this device (by ID) or IP on the banned list?
-    const bannedByIp = await base44.asServiceRole.entities.Banned.filter({ ip });
-    let banned = bannedByIp.length > 0;
-    if (!banned && deviceId) {
-      const bannedByDevice = await base44.asServiceRole.entities.Banned.filter({ device_id: deviceId });
-      banned = bannedByDevice.length > 0;
-    }
+    // Is this device (by ID), exact IP, or WiFi/network IP range on the banned list?
+    const bans = await base44.asServiceRole.entities.Banned.list(200);
+    const banned = bans.some((b) =>
+      b.ip === ip ||
+      (deviceId && b.device_id === deviceId) ||
+      (b.cidr && cidrMatch(ip, b.cidr))
+    );
 
     await base44.asServiceRole.entities.VisitLog.create({
       ip: ip,

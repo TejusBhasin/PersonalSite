@@ -35,9 +35,14 @@ export default async function(req) {
     );
 
     // Is this visitor coming from a blocked WiFi network (matched by its public IP)?
+    // VIP devices are exempt from whole-network bans (but not from direct device bans).
     if (!banned) {
-      const blockedNetworks = await base44.asServiceRole.entities.BlockedNetwork.list(200);
-      banned = blockedNetworks.some((n) => n.ip && ips.includes(n.ip));
+      const vips = await base44.asServiceRole.entities.VIP.list(200);
+      const isVip = deviceId && vips.some((v) => v.device_id === deviceId);
+      if (!isVip) {
+        const blockedNetworks = await base44.asServiceRole.entities.BlockedNetwork.list(200);
+        banned = blockedNetworks.some((n) => n.ip && ips.includes(n.ip));
+      }
     }
 
     await base44.asServiceRole.entities.VisitLog.create({

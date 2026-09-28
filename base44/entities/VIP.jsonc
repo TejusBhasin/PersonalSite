@@ -1,0 +1,38 @@
+{
+  "name": "VIP",
+  "type": "object",
+  "properties": {
+    "device_id": {
+      "type": "string",
+      "description": "Device ID exempt from whole-network bans"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "device_id"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

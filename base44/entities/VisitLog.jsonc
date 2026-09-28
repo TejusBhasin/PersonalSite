@@ -3,7 +3,12 @@
   "type": "object",
   "properties": {
     "ip": {
-      "type": "string"
+      "type": "string",
+      "description": "IP the server saw for this visit"
+    },
+    "client_ip": {
+      "type": "string",
+      "description": "The visitor's real public IP, reported by their browser"
     },
     "device_id": {
       "type": "string"
@@ -15,6 +20,7 @@
       "type": "string"
     }
   },
+  "required": [],
   "rls": {
     "read": {
       "user_condition": {

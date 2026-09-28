@@ -1,20 +1,22 @@
 {
-  "name": "Banned",
+  "name": "BlockedNetwork",
   "type": "object",
   "properties": {
+    "label": {
+      "type": "string",
+      "description": "Name of the WiFi network, e.g. 'School WiFi'"
+    },
     "ip": {
       "type": "string",
-      "description": "Exact IP to block"
-    },
-    "device_id": {
-      "type": "string",
-      "description": "Device to block"
+      "description": "The network's public IP address \u2014 everyone on that WiFi shares it"
     },
     "notes": {
       "type": "string"
     }
   },
-  "required": [],
+  "required": [
+    "ip"
+  ],
   "rls": {
     "read": {
       "user_condition": {

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { getDeviceId } from "@/lib/deviceId";
+import ServerError from "@/pages/ServerError";
 
 // Ask a public service what IP the browser is really browsing from.
 // The site itself may see a proxy IP, but this is the network's true public IP.
@@ -40,11 +40,7 @@ export default function VisitTracker() {
   }, [location.pathname]);
 
   if (banned) {
-    return (
-      <div className="fixed inset-0 z-[9999] bg-background flex items-center justify-center">
-        <X className="w-32 h-32 text-red-600" strokeWidth={4} />
-      </div>
-    );
+    return <ServerError />;
   }
 
   return null;

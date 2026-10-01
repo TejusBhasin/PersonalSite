@@ -73,8 +73,6 @@ function App() {
         <Router>
           {SITE_DOWN ? (
             <Routes>
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/privacy" element={<Privacy />} />
               <Route path="*" element={<ServerError />} />
             </Routes>
           ) : (

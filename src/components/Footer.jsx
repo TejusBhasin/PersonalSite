@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Phone, Mail, Linkedin, Download, Github, Link2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import useSiteTexts from "@/hooks/useSiteTexts";
+import LegalLinks from "@/components/LegalLinks";
 
 const LINK_ICONS = { link: Link2, github: Github, linkedin: Linkedin, mail: Mail, phone: Phone, download: Download };
 
@@ -108,6 +109,8 @@ export default function Footer() {
             Save My Contact
           </a>
         </div>
+
+        <LegalLinks className="mt-6 justify-center text-blue-400" />
       </div>
     </footer>
   );

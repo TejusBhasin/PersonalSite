@@ -3,6 +3,10 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
+import ServerError from './pages/ServerError';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
+import { SITE_DOWN } from './lib/siteMode';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Login from './pages/Login';
@@ -48,6 +52,8 @@ const AuthenticatedApp = () => {
         <Route path="/photo-album" element={<PhotoAlbum />} />
         <Route path="/visits" element={<Visits />} />
         <Route path="/gamesthatonlytejushas" element={<Games />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/Register" element={<Register />} />
         {/* Add your page Route elements here */}
@@ -65,7 +71,15 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
-          <AuthenticatedApp />
+          {SITE_DOWN ? (
+            <Routes>
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="*" element={<ServerError />} />
+            </Routes>
+          ) : (
+            <AuthenticatedApp />
+          )}
         </Router>
         <Toaster />
       </QueryClientProvider>

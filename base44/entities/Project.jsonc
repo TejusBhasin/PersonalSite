@@ -46,6 +46,11 @@
       "type": "string",
       "description": "Last known GitHub push timestamp, used to detect changes"
     },
+    "auto_synced": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if this project was created automatically from GitHub (removed if the repo is deleted)"
+    },
     "sort_order": {
       "type": "integer",
       "default": 0

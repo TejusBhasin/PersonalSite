@@ -44,7 +44,7 @@ export default async function(req) {
     if (!Array.isArray(repos)) {
       return Response.json({ error: "Could not reach GitHub" }, { status: 502 });
     }
-    const ownRepos = repos.filter((r) => !r.fork);
+    const ownRepos = repos;
 
     // Existing projects, matched by slug or GitHub URL so nothing is duplicated.
     const existing = await base44.asServiceRole.entities.Project.list(500);
@@ -156,6 +156,7 @@ export default async function(req) {
         description: gen.description || "",
         readme: p.readme,
         github_pushed_at: p.repo.pushed_at || "",
+        auto_synced: true,
         sort_order: 500
       });
       changed.push({
@@ -164,6 +165,14 @@ export default async function(req) {
         description: p.repo.description || "",
         commits: []
       });
+    }
+
+    // Remove auto-synced projects whose repo no longer exists on GitHub.
+    const seenSlugs = new Set(ownRepos.map((r) => r.name.toLowerCase()));
+    for (const p of existing) {
+      if (p.auto_synced && !seenSlugs.has(p.slug)) {
+        await base44.asServiceRole.entities.Project.delete(p.id);
+      }
     }
 
     // Weekly devlog: write up the week's changes in Tejus's voice.
@@ -179,12 +188,20 @@ export default async function(req) {
       });
       const content = typeof devRes === "string" ? devRes : (devRes.response || devRes.content || JSON.stringify(devRes));
       const today = new Date();
-      await base44.asServiceRole.entities.Devlog.create({
-        title: `Week of ${today.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`,
-        week_of: today.toISOString().slice(0, 10),
-        content,
-        repos: changed.map((c) => c.name)
-      });
+      const weekOf = today.toISOString().slice(0, 10);
+      const title = `Week of ${today.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`;
+      // One devlog per day: update today's entry instead of duplicating it.
+      const todaysLog = await base44.asServiceRole.entities.Devlog.filter({ week_of: weekOf });
+      if (todaysLog.length > 0) {
+        await base44.asServiceRole.entities.Devlog.update(todaysLog[0].id, { title, content, repos: changed.map((c) => c.name) });
+      } else {
+        await base44.asServiceRole.entities.Devlog.create({
+          title,
+          week_of: weekOf,
+          content,
+          repos: changed.map((c) => c.name)
+        });
+      }
       devlogWritten = true;
     }
 

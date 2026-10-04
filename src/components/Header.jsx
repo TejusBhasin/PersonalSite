@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 export default function Header() {
   const texts = useSiteTexts();
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -84,7 +85,7 @@ export default function Header() {
         </nav>
 
         {/* Mobile menu */}
-        <Sheet>
+        <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
           <SheetTrigger asChild className="sm:hidden">
             <Button variant="ghost" size="icon" className="text-foreground">
               <Menu className="h-6 w-6" />
@@ -95,6 +96,7 @@ export default function Header() {
             <nav className="flex flex-col gap-8 mt-16 px-4">
               <Link
                 to="/"
+                onClick={() => setMenuOpen(false)}
                 className="text-2xl font-black tracking-widest uppercase text-foreground hover:text-foreground/70 transition-colors duration-200"
                 style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}
               >
@@ -102,6 +104,7 @@ export default function Header() {
               </Link>
               <Link
                 to="/devlog"
+                onClick={() => setMenuOpen(false)}
                 className="text-2xl font-black tracking-widest uppercase text-foreground hover:text-foreground/70 transition-colors duration-200"
                 style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}
               >

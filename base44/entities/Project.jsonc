@@ -38,6 +38,14 @@
     "description": {
       "type": "string"
     },
+    "readme": {
+      "type": "string",
+      "description": "The project's GitHub README (markdown), synced weekly"
+    },
+    "github_pushed_at": {
+      "type": "string",
+      "description": "Last known GitHub push timestamp, used to detect changes"
+    },
     "sort_order": {
       "type": "integer",
       "default": 0

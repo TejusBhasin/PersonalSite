@@ -1,0 +1,51 @@
+{
+  "name": "Devlog",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Devlog entry title, e.g. 'Week of October 4, 2026'"
+    },
+    "week_of": {
+      "type": "string",
+      "description": "ISO date of the sync that produced this entry"
+    },
+    "content": {
+      "type": "string",
+      "description": "Markdown write-up of the week's GitHub changes, written in Tejus's voice"
+    },
+    "repos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Repos that changed this week"
+    },
+    "visible": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "title",
+    "content"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

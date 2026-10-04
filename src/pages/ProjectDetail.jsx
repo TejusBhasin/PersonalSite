@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Github } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { base44 } from "@/api/base44Client";
 
 const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
@@ -165,6 +166,29 @@ export default function ProjectDetail() {
           </div>
           <p className="text-foreground/80 leading-loose text-base text-justify font-medium">{project.description}</p>
         </section>
+
+        {project.readme && (
+          <section className="mb-12">
+            <div className="flex items-center gap-4 mb-5">
+              <h2 className="text-xl md:text-2xl font-bold text-foreground tracking-tight shrink-0" style={MONT}>
+                README &amp; Instructions
+              </h2>
+              <div className="flex-1 h-px bg-border/60" />
+            </div>
+            <div className="rounded-xl border border-border/60 bg-card/50 p-6 md:p-8 text-sm md:text-base text-foreground/80 leading-relaxed [&_h1]:text-xl [&_h1]:font-bold [&_h1]:mt-6 [&_h1]:mb-3 [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-3 [&_h3]:font-bold [&_h3]:mt-5 [&_h3]:mb-2 [&_p]:mb-4 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-4 [&_a]:text-foreground [&_a]:font-bold [&_a]:underline [&_a]:underline-offset-4 [&_code]:font-mono [&_code]:text-xs [&_code]:bg-muted [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_pre]:bg-muted [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:mb-4 [&_img]:rounded-lg [&_img]:mb-4 [&_img]:max-w-full">
+              <ReactMarkdown
+                urlTransform={(url) => {
+                  if (/^(https?:|mailto:|#|data:)/i.test(url)) return url;
+                  const m = (project.github_url || "").match(/github\.com\/([^/]+)\/([^/]+)/);
+                  if (!m) return url;
+                  return `https://raw.githubusercontent.com/${m[1]}/${m[2]}/HEAD/${url.replace(/^\.?\//, "")}`;
+                }}
+              >
+                {project.readme}
+              </ReactMarkdown>
+            </div>
+          </section>
+        )}
 
         <a
           href={project.url}

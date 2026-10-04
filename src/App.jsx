@@ -18,6 +18,7 @@ import PhotoAlbum from './pages/PhotoAlbum';
 import Games from './pages/Games';
 import PlayGame from './pages/PlayGame';
 import Visits from './pages/Visits';
+import Devlog from './pages/Devlog';
 import VisitTracker from './components/VisitTracker';
 import ContentGuard from './components/ContentGuard';
 // Add page imports here
@@ -49,6 +50,7 @@ const AuthenticatedApp = () => {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/devlog" element={<Devlog />} />
         <Route path="/photo-album" element={<PhotoAlbum />} />
         <Route path="/visits" element={<Visits />} />
         <Route path="/gamesthatonlytejushas" element={<Games />} />

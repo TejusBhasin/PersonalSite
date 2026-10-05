@@ -53,7 +53,7 @@ const AuthenticatedApp = () => {
         <Route path="/devlog" element={<Devlog />} />
         <Route path="/photo-album" element={<PhotoAlbum />} />
         <Route path="/visits" element={<Visits />} />
-        <Route path="/gamesthatonlytejushas" element={<Games />} />
+        <Route path="/games" element={<Games />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/Login" element={<Login />} />
@@ -61,7 +61,7 @@ const AuthenticatedApp = () => {
         {/* Add your page Route elements here */}
       </Route>
       <Route path="/project/:slug" element={<ProjectDetail />} />
-      <Route path="/gamesthatonlytejushas/:slug" element={<PlayGame />} />
+      <Route path="/games/:slug" element={<PlayGame />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </>

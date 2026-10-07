@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { getDeviceId } from "@/lib/deviceId";
 
@@ -6,6 +6,12 @@ export default function ServerError() {
   const location = useLocation();
   const [urlTaps, setUrlTaps] = useState(0);
   const [revealed, setRevealed] = useState(false);
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    window.scrollTo(0, 0);
+    return () => { document.body.style.overflow = ""; };
+  }, []);
 
   const tapUrl = () => {
     if (revealed) return;
@@ -17,7 +23,7 @@ export default function ServerError() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="fixed inset-0 z-[9999] bg-white flex flex-col overflow-hidden">
       <p className="font-mono text-black text-sm md:text-base px-2 pt-2 select-none">
         {`<<ERROR> SERVER NOT RESPONDING `}
         <span onClick={tapDns}>DNS </span>

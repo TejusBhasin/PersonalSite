@@ -26,8 +26,9 @@ export default function ServerError() {
     <div className="fixed inset-0 z-[9999] bg-white flex flex-col overflow-hidden">
       <p className="font-mono text-black text-sm md:text-base px-2 pt-2 select-none">
         {`<<ERROR> SERVER NOT RESPONDING `}
-        <span onClick={tapDns}>DNS </span>
-        <span onClick={tapUrl}>TEJUSBHASIN.INFO</span>
+        <span onClick={tapDns} className="inline-block py-4 -my-4 touch-manipulation cursor-default">DNS</span>
+        {" "}
+        <span onClick={tapUrl} className="inline-block py-4 -my-4 touch-manipulation cursor-default">TEJUSBHASIN.INFO</span>
         {`${location.pathname} >`}
       </p>
       {revealed && (

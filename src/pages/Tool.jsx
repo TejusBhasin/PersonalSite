@@ -4,7 +4,6 @@ import { TOOLS } from "@/lib/tools";
 import UnitConverter from "@/components/tools/UnitConverter";
 import ScientificCalculator from "@/components/tools/ScientificCalculator";
 import GpaCalculator from "@/components/tools/GpaCalculator";
-import TimeZoneConverter from "@/components/tools/TimeZoneConverter";
 import TextAnalyzer from "@/components/tools/TextAnalyzer";
 import MarkdownEditor from "@/components/tools/MarkdownEditor";
 import JsonFormatter from "@/components/tools/JsonFormatter";
@@ -14,7 +13,6 @@ import HashGenerator from "@/components/tools/HashGenerator";
 import Flashcards from "@/components/tools/Flashcards";
 import FocusTimer from "@/components/tools/FocusTimer";
 import TypingTest from "@/components/tools/TypingTest";
-import DebatePrep from "@/components/tools/DebatePrep";
 import ColorStudio from "@/components/tools/ColorStudio";
 import QrGenerator from "@/components/tools/QrGenerator";
 import PasswordGenerator from "@/components/tools/PasswordGenerator";
@@ -25,7 +23,6 @@ const COMPONENTS = {
   "unit-converter": UnitConverter,
   calculator: ScientificCalculator,
   gpa: GpaCalculator,
-  timezone: TimeZoneConverter,
   "text-analyzer": TextAnalyzer,
   "markdown-editor": MarkdownEditor,
   "json-formatter": JsonFormatter,
@@ -35,7 +32,6 @@ const COMPONENTS = {
   flashcards: Flashcards,
   "focus-timer": FocusTimer,
   typing: TypingTest,
-  "debate-prep": DebatePrep,
   "color-studio": ColorStudio,
   qr: QrGenerator,
   password: PasswordGenerator,

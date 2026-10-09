@@ -54,6 +54,14 @@ export default function Header() {
             Devlog
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-foreground transition-all duration-300 group-hover:w-full" />
           </Link>
+          <Link
+            to="/tools"
+            className="text-xs font-bold tracking-[0.2em] uppercase text-foreground/70 hover:text-foreground transition-colors duration-300 relative group"
+            style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}
+          >
+            Tools
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-foreground transition-all duration-300 group-hover:w-full" />
+          </Link>
           <a
             href="mailto:tejusbhasin17@gmail.com"
             className="text-xs font-bold tracking-[0.2em] uppercase text-foreground/70 hover:text-foreground transition-colors duration-300 relative group"
@@ -109,6 +117,14 @@ export default function Header() {
                 style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}
               >
                 Devlog
+              </Link>
+              <Link
+                to="/tools"
+                onClick={() => setMenuOpen(false)}
+                className="text-2xl font-black tracking-widest uppercase text-foreground hover:text-foreground/70 transition-colors duration-200"
+                style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}
+              >
+                Tools
               </Link>
               <a
                 href="mailto:tejusbhasin17@gmail.com"

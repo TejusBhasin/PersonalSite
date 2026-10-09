@@ -20,7 +20,7 @@ import PlayGame from './pages/PlayGame';
 import Visits from './pages/Visits';
 import Devlog from './pages/Devlog';
 import Tools from './pages/Tools';
-import WebProxy from './pages/WebProxy';
+import Tool from './pages/Tool';
 import VisitTracker from './components/VisitTracker';
 import ContentGuard from './components/ContentGuard';
 // Add page imports here
@@ -57,7 +57,7 @@ const AuthenticatedApp = () => {
         <Route path="/visits" element={<Visits />} />
         <Route path="/games" element={<Games />} />
         <Route path="/tools" element={<Tools />} />
-        <Route path="/tools/proxy" element={<WebProxy />} />
+        <Route path="/tools/:toolId" element={<Tool />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/Login" element={<Login />} />

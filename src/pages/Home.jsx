@@ -134,7 +134,7 @@ function AboutSection({ texts }) {
             <div className="relative group rounded-xl overflow-hidden shadow-2xl">
               <div className="absolute inset-0 bg-foreground/20 group-hover:bg-transparent transition-colors duration-500 z-10 pointer-events-none" />
               <img
-                src="https://media.base44.com/images/public/6a29e04307b892bb19072d29/62e0f2ed8_lh3_googleusercontent_com_AA5AbUD3pTVmj78h3cm0KSASrke7KecmJ-whXSuvYzJ1dWHKSsK5nnh80eh9zqO88vPPE42erEb30jd6WVek9QEO28jS5aDjkIp89PEr5RIJNcVBXGz8bzyqGyeJCAkFArE5dwAcHWivgXMrOruwXIq0n8YSOxJVaR1sSgDtsfddvfatGG4uSVexeGZnlMB3f5y4csb80eWpQwN9RVUV-_caA5uQUmOQzCwQ5ARnoz9q_w1280_951ea3bd.png"
+                src="https://media.base44.com/images/public/6a29e04307b892bb19072d29/6714eec6a_C8DD4121-3CE5-4E73-AA33-11FD65FF1546.png"
                 alt="Tejus Bhasin"
                 className="w-full h-auto object-cover aspect-[4/5] scale-105 group-hover:scale-110 transition-transform duration-700 ease-in-out"
               />

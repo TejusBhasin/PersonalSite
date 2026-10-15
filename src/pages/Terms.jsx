@@ -23,13 +23,10 @@ export default function Terms() {
       <Section title="4. Acceptable Use">
         <p>You agree not to misuse the site, attempt to disrupt it, or access it in ways intended to cause harm.</p>
       </Section>
-      <Section title="5. Site Security &amp; Access Monitoring">
-        <p>To keep the site secure, visits are logged (see the Privacy Policy for details), and the site may block individual devices or entire networks that pose a risk. Blocks are applied at the operator's discretion and may be lifted on request.</p>
-      </Section>
-      <Section title="6. Changes">
+      <Section title="5. Changes">
         <p>These terms may be updated at any time. Continued use of the site means you accept the updated terms.</p>
       </Section>
-      <Section title="7. Contact">
+      <Section title="6. Contact">
         <p>Questions? Email tejusbhasin17@gmail.com.</p>
       </Section>
       <p className="text-xs text-muted-foreground">Last updated: October 2026</p>

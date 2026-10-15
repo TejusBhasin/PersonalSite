@@ -134,8 +134,10 @@ function AboutSection({ texts }) {
             <div className="relative group rounded-xl overflow-hidden shadow-2xl">
               <div className="absolute inset-0 bg-foreground/20 group-hover:bg-transparent transition-colors duration-500 z-10 pointer-events-none" />
               <img
-                src="https://media.base44.com/images/public/6a29e04307b892bb19072d29/6714eec6a_C8DD4121-3CE5-4E73-AA33-11FD65FF1546.png"
+                src="/portrait.jpg"
                 alt="Tejus Bhasin"
+                width="640"
+                height="800"
                 className="w-full h-auto object-cover aspect-[4/5] scale-105 group-hover:scale-110 transition-transform duration-700 ease-in-out"
               />
             </div>

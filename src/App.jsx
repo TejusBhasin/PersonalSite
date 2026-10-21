@@ -6,7 +6,7 @@ import PageNotFound from './lib/PageNotFound';
 import ServerError from './pages/ServerError';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
-import { SITE_DOWN } from './lib/siteMode';
+import useServerErrorMode from './hooks/useServerErrorMode';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Login from './pages/Login';
@@ -73,11 +73,17 @@ const AuthenticatedApp = () => {
 };
 
 function App() {
+  const errorMode = useServerErrorMode();
+
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
-          {SITE_DOWN ? (
+          {errorMode === null ? (
+            <div className="fixed inset-0 flex items-center justify-center">
+              <div className="w-8 h-8 border-4 border-muted border-t-foreground rounded-full animate-spin" />
+            </div>
+          ) : errorMode === 1 ? (
             <Routes>
               <Route path="*" element={<ServerError />} />
             </Routes>

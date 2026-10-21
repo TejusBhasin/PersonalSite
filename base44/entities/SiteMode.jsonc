@@ -1,0 +1,37 @@
+{
+  "name": "SiteMode",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "Which setting this record controls",
+      "default": "server_error"
+    },
+    "value": {
+      "type": "integer",
+      "description": "1 = show the server error screen to everyone; 0 = show it only to blocked networks and devices",
+      "default": 0
+    }
+  },
+  "required": [
+    "key"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

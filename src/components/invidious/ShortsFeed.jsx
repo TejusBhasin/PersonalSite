@@ -5,7 +5,7 @@ import { fmtViews } from "@/lib/invidiousFormat";
 
 const DEFAULT_TOPICS = ["Gaming", "Space", "AI", "Basketball", "History", "Cats", "Cooking", "Coding"];
 
-export default function ShortsFeed({ instances, prefs, onToggleLike, onAddTopic }) {
+export default function ShortsFeed({ prefs, onToggleLike, onAddTopic }) {
   const [topicInput, setTopicInput] = useState("");
   const [feed, setFeedState] = useState(null);
   const [activeIdx, setActiveIdx] = useState(0);
@@ -17,11 +17,6 @@ export default function ShortsFeed({ instances, prefs, onToggleLike, onAddTopic 
     feedRef.current = next;
     setFeedState(next);
   };
-
-  const instance =
-    instances.find((i) => i.name === prefs.preferred_instance && !i.down) ||
-    instances.find((i) => !i.down) ||
-    instances[0];
 
   const runFetch = async (core) => {
     setFeed({ ...core, loadingMore: true, error: "" });
@@ -48,7 +43,7 @@ export default function ShortsFeed({ instances, prefs, onToggleLike, onAddTopic 
 
   const start = (t) => {
     const clean = (t || "").trim();
-    if (!clean || !instance) return;
+    if (!clean) return;
     onAddTopic(clean);
     setActiveIdx(0);
     runFetch({ topic: clean, items: [], next: null, done: false, loadingMore: false, error: "" });
@@ -155,12 +150,13 @@ export default function ShortsFeed({ instances, prefs, onToggleLike, onAddTopic 
           return (
             <div key={`${item.videoId}-${idx}`} className="h-full snap-start snap-always flex items-center justify-center px-2">
               <div className="relative h-full max-h-[85vh] aspect-[9/16] rounded-2xl overflow-hidden bg-black">
-                {Math.abs(idx - activeIdx) <= 1 ? (
+                {isActive ? (
                   <iframe
-                    key={`${instance?.uri}-${item.videoId}-${isActive ? "play" : "idle"}`}
-                    src={`${instance?.uri}/embed/${item.videoId}${isActive ? "?autoplay=1&local=true" : "?local=true"}`}
+                    key={`${item.videoId}-play`}
+                    src={`https://www.youtube-nocookie.com/embed/${item.videoId}?autoplay=1&mute=1&loop=1&playsinline=1&playlist=${item.videoId}`}
                     title={item.title}
                     className="absolute inset-0 w-full h-full"
+                    allow="autoplay; encrypted-media; picture-in-picture"
                     allowFullScreen
                   />
                 ) : (

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ExternalLink, Heart, Play, RefreshCw } from "lucide-react";
+import { ExternalLink, Heart, Play } from "lucide-react";
 
 // Accepts full YouTube URLs (watch, youtu.be, embed, shorts, live) or a bare video ID.
 const parseVideoId = (input) => {
@@ -19,11 +19,10 @@ const parseVideoId = (input) => {
   return /^[\w-]{6,15}$/.test(s) ? s : null;
 };
 
-export default function WatchPanel({ instances, instanceIndex, onSelectInstance, video, onWatch, liked, onToggleLike }) {
+export default function WatchPanel({ video, onWatch, liked, onToggleLike }) {
   const [input, setInput] = useState("");
   const [error, setError] = useState("");
 
-  const instance = instances[instanceIndex] || instances[0];
   const videoId = video?.videoId || "";
 
   const submit = (e) => {
@@ -36,10 +35,6 @@ export default function WatchPanel({ instances, instanceIndex, onSelectInstance,
       setError("Paste a YouTube link or video ID.");
     }
   };
-
-  if (!instance) {
-    return <p className="max-w-5xl mx-auto px-4 py-6 text-sm text-neutral-500">No instances synced yet.</p>;
-  }
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 space-y-4">
@@ -64,32 +59,15 @@ export default function WatchPanel({ instances, instanceIndex, onSelectInstance,
           {video?.title && <p className="text-base font-semibold">{video.title}</p>}
           <div className="aspect-video w-full bg-black rounded-lg overflow-hidden">
             <iframe
-              key={`${instance.uri}-${videoId}`}
-              src={`${instance.uri}/embed/${videoId}?autoplay=1&local=true`}
+              key={videoId}
+              src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&playsinline=1&rel=0`}
               title="Video player"
               className="w-full h-full"
+              allow="autoplay; encrypted-media; picture-in-picture"
               allowFullScreen
             />
           </div>
           <div className="flex flex-wrap items-center gap-3 text-sm">
-            <span className="text-neutral-400">Instance</span>
-            <select
-              value={instanceIndex}
-              onChange={(e) => onSelectInstance(Number(e.target.value))}
-              className="bg-neutral-900 border border-neutral-700 rounded-md px-3 py-1.5 text-sm outline-none"
-            >
-              {instances.map((inst, idx) => (
-                <option key={inst.id} value={idx}>
-                  {inst.flag} {inst.name}{inst.down ? " (down)" : ""} · {Math.round(inst.uptime || 0)}%
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={() => onSelectInstance((instanceIndex + 1) % instances.length)}
-              className="inline-flex items-center gap-1.5 bg-neutral-800 hover:bg-neutral-700 rounded-md px-3 py-1.5 transition-colors"
-            >
-              <RefreshCw className="w-3.5 h-3.5" /> Try another instance
-            </button>
             <button
               onClick={onToggleLike}
               className="inline-flex items-center gap-1.5 bg-neutral-800 hover:bg-neutral-700 rounded-md px-3 py-1.5 transition-colors"
@@ -98,19 +76,14 @@ export default function WatchPanel({ instances, instanceIndex, onSelectInstance,
               {liked ? "Liked" : "Like"}
             </button>
             <a
-              href={`${instance.uri}/watch?v=${videoId}`}
+              href={`https://www.youtube.com/watch?v=${videoId}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-neutral-400 hover:text-white transition-colors"
             >
-              <ExternalLink className="w-3.5 h-3.5" /> Open on {instance.name}
+              <ExternalLink className="w-3.5 h-3.5" /> Open on YouTube
             </a>
           </div>
-          {instance.down && (
-            <p className="text-xs text-amber-400">
-              This instance is currently reporting downtime, playback may fail. Try another instance.
-            </p>
-          )}
         </>
       ) : (
         <p className="text-sm text-neutral-500">

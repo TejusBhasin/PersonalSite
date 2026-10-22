@@ -12,8 +12,7 @@ const EMPTY = {
   history: [],
   liked: [],
   shorts_topics: [],
-  recent_searches: [],
-  preferred_instance: null
+  recent_searches: []
 };
 
 const readLocal = () => {
@@ -74,8 +73,7 @@ export default function useInvidiousPrefs() {
               history: byNewest(mergeByVideo(remote.history, local.history, 200)),
               liked: mergeByVideo(remote.liked, local.liked, 100),
               shorts_topics: [...new Set([...(local.shorts_topics || []), ...(remote.shorts_topics || [])])].slice(0, 12),
-              recent_searches: [...new Set([...(local.recent_searches || []), ...(remote.recent_searches || [])])].slice(0, 8),
-              preferred_instance: local.preferred_instance || remote.preferred_instance || null
+              recent_searches: [...new Set([...(local.recent_searches || []), ...(remote.recent_searches || [])])].slice(0, 8)
             };
           }
         } catch {
@@ -168,13 +166,9 @@ export default function useInvidiousPrefs() {
     }));
   }, [update]);
 
-  const setPreferredInstance = useCallback((name) => {
-    update((p) => ({ preferred_instance: name }));
-  }, [update]);
-
   const clearHistory = useCallback(() => {
     update((p) => ({ history: [] }));
   }, [update]);
 
-  return { prefs, ready, user, recordWatch, toggleLike, addTopic, addRecentSearch, setPreferredInstance, clearHistory };
+  return { prefs, ready, user, recordWatch, toggleLike, addTopic, addRecentSearch, clearHistory };
 }

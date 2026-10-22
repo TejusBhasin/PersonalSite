@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ExternalLink, Heart, Play } from "lucide-react";
+import Player from "@/components/invidious/Player";
 
 // Accepts full YouTube URLs (watch, youtu.be, embed, shorts, live) or a bare video ID.
 const parseVideoId = (input) => {
@@ -57,15 +58,8 @@ export default function WatchPanel({ video, onWatch, liked, onToggleLike }) {
       {videoId ? (
         <>
           {video?.title && <p className="text-base font-semibold">{video.title}</p>}
-          <div className="aspect-video w-full bg-black rounded-lg overflow-hidden">
-            <iframe
-              key={videoId}
-              src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&playsinline=1&rel=0`}
-              title="Video player"
-              className="w-full h-full"
-              allow="autoplay; encrypted-media; picture-in-picture"
-              allowFullScreen
-            />
+          <div className="relative aspect-video w-full bg-black rounded-lg overflow-hidden">
+            <Player videoId={videoId} title={video.title || "Video player"} />
           </div>
           <div className="flex flex-wrap items-center gap-3 text-sm">
             <button

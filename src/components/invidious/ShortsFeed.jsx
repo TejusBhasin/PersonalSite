@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, Heart, Loader2, Search } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import Player from "@/components/invidious/Player";
 import { fmtViews } from "@/lib/invidiousFormat";
 
 const DEFAULT_TOPICS = ["Gaming", "Space", "AI", "Basketball", "History", "Cats", "Cooking", "Coding"];
@@ -151,14 +152,7 @@ export default function ShortsFeed({ prefs, onToggleLike, onAddTopic }) {
             <div key={`${item.videoId}-${idx}`} className="h-full snap-start snap-always flex items-center justify-center px-2">
               <div className="relative h-full max-h-[85vh] aspect-[9/16] rounded-2xl overflow-hidden bg-black">
                 {isActive ? (
-                  <iframe
-                    key={`${item.videoId}-play`}
-                    src={`https://www.youtube-nocookie.com/embed/${item.videoId}?autoplay=1&mute=1&loop=1&playsinline=1&playlist=${item.videoId}`}
-                    title={item.title}
-                    className="absolute inset-0 w-full h-full"
-                    allow="autoplay; encrypted-media; picture-in-picture"
-                    allowFullScreen
-                  />
+                  <Player videoId={item.videoId} title={item.title} autoplay />
                 ) : (
                   <img
                     src={`https://i.ytimg.com/vi/${item.videoId}/hqdefault.jpg`}

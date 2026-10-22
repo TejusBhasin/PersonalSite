@@ -1,0 +1,27 @@
+{
+  "name": "InvidiousProfile",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "string",
+      "description": "JSON blob of the user's Invidious page prefs (watch history, likes, shorts topics, recent searches, preferred instance)"
+    }
+  },
+  "required": [
+    "data"
+  ],
+  "rls": {
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}

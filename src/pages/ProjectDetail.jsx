@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Github } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { base44 } from "@/api/base44Client";
+import ProjectPreview from "@/components/projects/ProjectPreview";
 
 const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
 
@@ -121,7 +122,7 @@ export default function ProjectDetail() {
           </div>
         ) : (
           <div className="relative rounded-xl overflow-hidden shadow-2xl border border-border/60 mb-12 group">
-            <img src={project.preview} alt={`${project.name} preview`} loading="lazy" decoding="async" className="w-full object-cover" />
+            <ProjectPreview project={project} className="w-full object-cover" />
           </div>
         )}
 

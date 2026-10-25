@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ExternalLink, ArrowRight, Github } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import ProjectPreview from "@/components/projects/ProjectPreview";
 
 const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
 
@@ -46,11 +47,8 @@ function ProjectCard({ project, index }) {
           rel="noopener noreferrer"
           className="relative block overflow-hidden"
         >
-          <img
-            src={project.preview}
-            alt={`${project.name} preview`}
-            loading="lazy"
-            decoding="async"
+          <ProjectPreview
+            project={project}
             className="w-full aspect-[16/10] object-contain bg-card group-hover:scale-105 transition-transform duration-700 ease-in-out"
           />
           <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/20 transition-colors duration-300 flex items-center justify-center">

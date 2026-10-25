@@ -15,13 +15,16 @@ export default async function(req) {
       body = {};
     }
     let q = body?.q ?? null;
+    const mode = body?.mode === "shorts" ? "shorts" : "videos";
+    let continuation = body?.continuation ?? null;
+    if (typeof continuation !== "object" || continuation === null) continuation = null;
     if (typeof q === "number") q = String(q);
     const query = (typeof q === "string" ? q : "").trim();
     if (query.length === 0 || query.length > 100) {
       return Response.json({ error: "Invalid query" }, { status: 400 });
     }
 
-    const out = await searchYouTube(query, "videos", null);
+    const out = await searchYouTube(query, mode, continuation);
     const candidates = await fetchCandidates();
     const thumbBase = candidates.length ? candidates[0].url : "";
 
@@ -34,7 +37,7 @@ export default async function(req) {
       thumbnail: thumbBase ? `${thumbBase}/vi/${v.videoId}/mqdefault.jpg` : ""
     }));
 
-    return Response.json({ results, instances: candidates.map((c) => c.url) });
+    return Response.json({ results, next: out.next ?? null, instances: candidates.map((c) => c.url) });
   } catch (error) {
     if (error && error.status) {
       return Response.json({ error: error.message }, { status: error.status });

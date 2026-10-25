@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, Heart, Loader2, Volume2, VolumeX } from "lucide-react";
-import useAmmeStream from "@/hooks/useAmmeStream";
-import StreamControls from "@/components/amme/StreamControls";
+import useVidiousStream from "@/hooks/useVidiousStream";
+import StreamControls from "@/components/vidious/StreamControls";
 import { fmtViews } from "@/lib/invidiousFormat";
 
-// One slot in the AMME shorts feed. The active slot streams through the
+// One slot in the Vidious shorts feed. The active slot streams through the
 // browser-side proxy (muted autoplay, tap to unmute); inactive slots
 // show the thumbnail. Ends or errors hand control back to the feed.
-export default function AmmeShortCard({ short, active, instances, onNext, liked, onToggleLike }) {
-  const { videoRef, playerRef, streamUrl, workingInstance, probing, failed } = useAmmeStream({
+export default function VidiousShortCard({ short, active, instances, onNext, liked, onToggleLike }) {
+  const { videoRef, playerRef, streamUrl, workingInstance, probing, failed } = useVidiousStream({
     videoId: active ? short.videoId : null,
     instances
   });

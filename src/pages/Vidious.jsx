@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { Loader2, Search, Zap } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import AmmeNotice from "@/components/amme/AmmeNotice";
-import AmmeSearchResults from "@/components/amme/AmmeSearchResults";
-import AmmePlayer from "@/components/amme/AmmePlayer";
-import AmmeShortsFeed from "@/components/amme/AmmeShortsFeed";
+import VidiousNotice from "@/components/vidious/VidiousNotice";
+import VidiousSearchResults from "@/components/vidious/VidiousSearchResults";
+import VidiousPlayer from "@/components/vidious/VidiousPlayer";
+import VidiousShortsFeed from "@/components/vidious/VidiousShortsFeed";
 
 const errMsg = (err) =>
   err?.response?.data?.error || err?.data?.error || err?.message || "Something went wrong.";
 
-export default function Amme() {
+export default function Vidious() {
   const [tab, setTab] = useState("search");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState(null);
@@ -58,12 +58,12 @@ export default function Amme() {
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-neutral-200">
       <header className="border-b border-neutral-800 px-6 py-4">
-        <h1 className="text-2xl font-black tracking-tight text-[#ff4d4d]">AMME</h1>
+        <h1 className="text-2xl font-black tracking-tight text-[#ff4d4d]">VIDIOUS</h1>
         <p className="text-xs text-neutral-500">Video access for restricted networks</p>
       </header>
 
       <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
-        <AmmeNotice />
+        <VidiousNotice />
 
         <div className="flex gap-2">
           <button onClick={() => setTab("search")} className={tabCls(tab === "search")}>
@@ -75,7 +75,7 @@ export default function Amme() {
         </div>
 
         {tab === "shorts" ? (
-          <AmmeShortsFeed />
+          <VidiousShortsFeed />
         ) : (
           <>
             <form onSubmit={runSearch} className="flex gap-2">
@@ -98,11 +98,11 @@ export default function Amme() {
             {error && <p className="text-sm text-red-400">{error}</p>}
 
             {video && (
-              <AmmePlayer video={video} instances={instances} onClose={() => setVideo(null)} />
+              <VidiousPlayer video={video} instances={instances} onClose={() => setVideo(null)} />
             )}
 
             {results && !video && (
-              <AmmeSearchResults results={results} onPlay={setVideo} />
+              <VidiousSearchResults results={results} onPlay={setVideo} />
             )}
           </>
         )}

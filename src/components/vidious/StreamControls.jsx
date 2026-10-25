@@ -3,10 +3,10 @@ import { Captions, Gauge, Loader2, SlidersHorizontal } from "lucide-react";
 
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 
-// Overlay controls for the AMME player, wired to the official Invidious
-// API: /api/v1/captions/{id} lists the tracks, /api/v1/captions/{id}?label=
-// serves the WebVTT (attached as a blob text track), and dash.js
-// representations power the quality selector.
+// Overlay controls for the Vidious player, wired to the official
+// Invidious API: /api/v1/captions/{id} lists the tracks,
+// /api/v1/captions/{id}?label= serves the WebVTT (attached as a blob
+// text track), and dash.js representations power the quality selector.
 
 const btn = (on) =>
   `inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-semibold transition-colors ${

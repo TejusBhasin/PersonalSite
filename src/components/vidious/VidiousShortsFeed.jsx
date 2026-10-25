@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader2, Search } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import AmmeShortCard from "@/components/amme/AmmeShortCard";
-import { buildQueue } from "@/lib/ammeAlgorithm";
+import VidiousShortCard from "@/components/vidious/VidiousShortCard";
+import { buildQueue } from "@/lib/vidiousAlgorithm";
 
 const TOPICS = ["Gaming", "Space", "AI", "Basketball", "History", "Cats", "Cooking", "Coding", "Science", "Football"];
 
-// The AMME shorts doomscroll: pick a topic, and the feed keeps serving
-// engagement-ranked shorts (see lib/ammeAlgorithm.js), auto-loading the
+// The Vidious shorts doomscroll: pick a topic, and the feed keeps serving
+// engagement-ranked shorts (see lib/vidiousAlgorithm.js), auto-loading the
 // next page as you near the end. Likes are kept in browser storage.
 
-export default function AmmeShortsFeed() {
+export default function VidiousShortsFeed() {
   const [topic, setTopic] = useState("");
   const [input, setInput] = useState("");
   const [queue, setQueue] = useState([]);
@@ -20,7 +20,7 @@ export default function AmmeShortsFeed() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [likedIds, setLikedIds] = useState(() => {
-    try { return new Set(JSON.parse(localStorage.getItem("amme_likes") || "[]")); } catch { return new Set(); }
+    try { return new Set(JSON.parse(localStorage.getItem("vidious_likes") || "[]")); } catch { return new Set(); }
   });
   const seen = useRef(new Set());
   const scrollRef = useRef(null);
@@ -76,7 +76,7 @@ export default function AmmeShortsFeed() {
       const updated = new Set(prev);
       if (updated.has(short.videoId)) updated.delete(short.videoId);
       else updated.add(short.videoId);
-      try { localStorage.setItem("amme_likes", JSON.stringify([...updated])); } catch { /* private mode */ }
+      try { localStorage.setItem("vidious_likes", JSON.stringify([...updated])); } catch { /* private mode */ }
       return updated;
     });
   };
@@ -149,7 +149,7 @@ export default function AmmeShortsFeed() {
         className="h-[calc(100vh-230px)] min-h-[480px] overflow-y-auto snap-y snap-mandatory scroll-smooth"
       >
         {queue.map((short, i) => (
-          <AmmeShortCard
+          <VidiousShortCard
             key={`${short.videoId}-${i}`}
             short={short}
             active={i === idx}

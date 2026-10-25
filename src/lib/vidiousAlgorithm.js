@@ -1,4 +1,4 @@
-// Feed ranking for the AMME shorts doomscroll: engagement-weighted
+// Feed ranking for the Vidious shorts doomscroll: engagement-weighted
 // scoring with a recency boost, a bonus for true short-form lengths,
 // and a random exploration jitter so proven shorts dominate the feed
 // while sleepers still surface.

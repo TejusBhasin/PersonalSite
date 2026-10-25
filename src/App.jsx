@@ -24,7 +24,7 @@ import Tool from './pages/Tool';
 import VisitTracker from './components/VisitTracker';
 import ContentGuard from './components/ContentGuard';
 import Invidious from './pages/Invidious';
-import Amme from './pages/Amme';
+import Vidious from './pages/Vidious';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -68,7 +68,7 @@ const AuthenticatedApp = () => {
       </Route>
       <Route path="/project/:slug" element={<ProjectDetail />} />
       <Route path="/invidious" element={<Invidious />} />
-      <Route path="/amme" element={<Amme />} />
+      <Route path="/vidious" element={<Vidious />} />
       <Route path="/games/:slug" element={<PlayGame />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>

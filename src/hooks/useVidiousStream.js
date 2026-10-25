@@ -1,19 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import dashjs from "dashjs";
 
-// Shared stream setup for the /amme page: probes the public Invidious
+// Shared stream setup for the /vidious page: probes the public Invidious
 // instances live in this browser (cached instance first, per the
 // official /api/manifest/dash/id/{id}?local=true endpoint), then plays
 // the proxied DASH stream with dash.js. Used by both the main player
 // and the shorts feed.
 
-const CACHE_KEY = "amme_instance";
+const CACHE_KEY = "vidious_instance";
 
 export function rememberInstance(url) {
   try { localStorage.setItem(CACHE_KEY, url); } catch { /* private mode */ }
 }
 
-export default function useAmmeStream({ videoId, instances = [] }) {
+export default function useVidiousStream({ videoId, instances = [] }) {
   const videoRef = useRef(null);
   const playerRef = useRef(null);
   const instancesKey = (instances || []).filter(Boolean).join("|");

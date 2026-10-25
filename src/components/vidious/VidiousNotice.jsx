@@ -1,6 +1,6 @@
 import { AlertTriangle } from "lucide-react";
 
-export default function AmmeNotice() {
+export default function VidiousNotice() {
   return (
     <section className="border border-neutral-800 bg-neutral-900/60 rounded-lg px-4 py-3 flex gap-3">
       <AlertTriangle className="w-4 h-4 text-neutral-400 shrink-0 mt-0.5" />

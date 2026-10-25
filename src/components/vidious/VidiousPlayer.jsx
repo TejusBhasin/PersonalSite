@@ -1,12 +1,12 @@
 import { X } from "lucide-react";
-import useAmmeStream from "@/hooks/useAmmeStream";
-import StreamControls from "@/components/amme/StreamControls";
+import useVidiousStream from "@/hooks/useVidiousStream";
+import StreamControls from "@/components/vidious/StreamControls";
 
-// Main video player for the /amme page: plays the proxied DASH stream
+// Main video player for the /vidious page: plays the proxied DASH stream
 // in-browser with native controls plus captions, playback speed, and
 // quality selection.
-export default function AmmePlayer({ video, instances = [], onClose }) {
-  const { videoRef, playerRef, streamUrl, workingInstance, probing, failed } = useAmmeStream({
+export default function VidiousPlayer({ video, instances = [], onClose }) {
+  const { videoRef, playerRef, streamUrl, workingInstance, probing, failed } = useVidiousStream({
     videoId: video?.videoId,
     instances
   });

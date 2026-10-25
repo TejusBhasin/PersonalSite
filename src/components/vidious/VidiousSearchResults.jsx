@@ -8,7 +8,7 @@ const fmtDuration = (s) => {
   return `${h ? h + ":" : ""}${mm}:${String(sec).padStart(2, "0")}`;
 };
 
-export default function AmmeSearchResults({ results, onPlay }) {
+export default function VidiousSearchResults({ results, onPlay }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {results.map((item) => (

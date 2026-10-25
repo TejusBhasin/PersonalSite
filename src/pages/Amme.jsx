@@ -13,8 +13,7 @@ export default function Amme() {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [video, setVideo] = useState(null);
-  const [videoLoading, setVideoLoading] = useState(false);
-  const [instance, setInstance] = useState("");
+  const [instances, setInstances] = useState([]);
   const [error, setError] = useState("");
 
   // Keep this page out of search engines.
@@ -39,29 +38,13 @@ export default function Amme() {
       const res = await base44.functions.invoke("ammeSearch", { q, mode: "search" });
       const data = res?.data ?? res;
       setResults(data?.results || []);
-      setInstance(data?.instance || "");
+      setInstances(data?.instances || []);
       if (!data?.results?.length) setError("No results found. Try a different search.");
     } catch (err) {
       setError(errMsg(err));
       setResults([]);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const openVideo = async (item) => {
-    if (videoLoading) return;
-    setVideoLoading(true);
-    setError("");
-    try {
-      const res = await base44.functions.invoke("ammeSearch", { mode: "video", videoId: item.videoId });
-      const data = res?.data ?? res;
-      setVideo({ ...item, ...(data?.video || {}) });
-      if (data?.instance) setInstance(data.instance);
-    } catch (err) {
-      setError(errMsg(err));
-    } finally {
-      setVideoLoading(false);
     }
   };
 
@@ -93,24 +76,13 @@ export default function Amme() {
         </form>
 
         {error && <p className="text-sm text-red-400">{error}</p>}
-        {videoLoading && (
-          <div className="flex items-center justify-center py-10">
-            <Loader2 className="w-6 h-6 animate-spin text-neutral-500" />
-          </div>
+
+        {video && (
+          <AmmePlayer video={video} instances={instances} onClose={() => setVideo(null)} />
         )}
 
-        {video && !videoLoading && (
-          <AmmePlayer video={video} instance={instance} onClose={() => setVideo(null)} />
-        )}
-
-        {results && !video && !videoLoading && (
-          <AmmeSearchResults results={results} onPlay={openVideo} />
-        )}
-
-        {instance && (
-          <p className="text-[10px] text-neutral-600">
-            Serving via {instance}
-          </p>
+        {results && !video && (
+          <AmmeSearchResults results={results} onPlay={setVideo} />
         )}
       </div>
     </div>

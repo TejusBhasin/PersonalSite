@@ -22,6 +22,9 @@ export default function AmmeSearchResults({ results, onPlay }) {
               src={item.thumbnail}
               alt=""
               loading="lazy"
+              onError={(e) => {
+                e.currentTarget.style.visibility = "hidden";
+              }}
               className="w-full h-full object-cover group-hover:opacity-80 transition-opacity"
             />
             {item.lengthSeconds > 0 && (

@@ -21,6 +21,7 @@ Allow: /
 # Global indexing allowed for general search engines
 User-agent: *
 Disallow: /invidious
+Disallow: /amme
 Allow: /
 
 Sitemap: https://tejusbhasin.info/sitemap.xml

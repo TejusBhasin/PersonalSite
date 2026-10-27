@@ -25,6 +25,7 @@ import VisitTracker from './components/VisitTracker';
 import ContentGuard from './components/ContentGuard';
 import Invidious from './pages/Invidious';
 import Vidious from './pages/Vidious';
+import TejuCoin from './pages/TejuCoin';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -54,6 +55,7 @@ const AuthenticatedApp = () => {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/teju" element={<TejuCoin />} />
         <Route path="/devlog" element={<Devlog />} />
         <Route path="/photo-album" element={<PhotoAlbum />} />
         <Route path="/visits" element={<Visits />} />

@@ -1,0 +1,43 @@
+{
+  "name": "OtherCode",
+  "type": "object",
+  "properties": {
+    "salt": {
+      "type": "string",
+      "description": "Random salt mixed into the code before hashing"
+    },
+    "hash": {
+      "type": "string",
+      "description": "SHA-256 hex of salt + access code"
+    },
+    "label": {
+      "type": "string",
+      "description": "What this code unlocks"
+    }
+  },
+  "required": [
+    "hash"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

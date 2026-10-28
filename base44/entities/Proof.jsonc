@@ -1,0 +1,47 @@
+{
+  "name": "Proof",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Certificate title, e.g. 'National Merit Finalist'"
+    },
+    "subtitle": {
+      "type": "string",
+      "description": "Short line shown under the title"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "The uploaded certificate image"
+    },
+    "sort_order": {
+      "type": "integer",
+      "default": 0
+    },
+    "visible": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "title"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

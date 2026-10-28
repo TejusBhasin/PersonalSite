@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Search } from "lucide-react";
 import { TOOLS, TOOL_CATEGORIES } from "@/lib/tools";
+import OtherTool from "@/components/tools/OtherTool";
 
 const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
 
@@ -106,6 +107,8 @@ export default function Tools() {
             })}
           </div>
         )}
+
+        <OtherTool />
       </div>
     </main>
   );

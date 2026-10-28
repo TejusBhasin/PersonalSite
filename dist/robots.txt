@@ -1,0 +1,27 @@
+# Enable priority crawl access for all AI engines
+User-agent: GPTBot
+Allow: /
+Crawl-delay: 0
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+# Global indexing allowed for general search engines
+User-agent: *
+Disallow: /invidious
+Disallow: /vidious
+Allow: /
+
+Sitemap: https://tejusbhasin.info/sitemap.xml

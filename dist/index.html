@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tejus Bhasin — Student, Developer & Founder</title>
+    <meta name="description" content="Tejus Bhasin is a student developer and founder building Lexio and DebateLab, with work in AI, full-stack software engineering, and civic policy." />
+    <meta property="og:title" content="Tejus Bhasin" />
+    <meta property="og:description" content="Student developer and founder of Lexio and DebateLab — AI, software engineering, and civic policy." />
+    <meta property="og:type" content="profile" />
+    <meta property="og:url" content="https://tejusbhasin.info" />
+    <link rel="canonical" href="https://tejusbhasin.info" />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Tejus Bhasin",
+      "alternateName": "Tejus Bhasin",
+      "jobTitle": "Founder & Software Architect",
+      "url": "https://tejusbhasin.info",
+      "knowsAbout": [
+        "Artificial Intelligence architecture",
+        "Software engineering",
+        "Civic policy and infrastructure optimization",
+        "Full-stack low-latency deployment"
+      ],
+      "description": "Tejus Bhasin is a student developer and full-stack software engineer. He is the founder of Lexio and DebateLab, with work spanning AI, software engineering, and civic policy."
+    }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://media.base44.com" crossorigin>
+    
+    <script type="module" crossorigin src="/assets/index-SR9VtjeV.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BETuTLgu.css">
+    <script type="module">
+if (window.self === window.top) {
+  let lastPath = "";
+  function getPageNameFromPath(path) {
+    const segments = path.split("/").filter(Boolean);
+    return segments[0] || null;
+  }
+  function trackPageView() {
+    const path = window.location.pathname;
+    if (path === lastPath) return;
+    lastPath = path;
+    const pageName = getPageNameFromPath(path) || "home";
+    const appId = "6a29e04307b892bb19072d29";
+    if (!appId) return;
+    fetch(`/api/app-logs/${appId}/log-user-in-app/${pageName}`, {
+      method: "POST",
+    }).catch(() => {});
+  }
+  const originalPushState = history.pushState.bind(history);
+  history.pushState = function (...args) {
+    originalPushState(...args);
+    trackPageView();
+  };
+  const originalReplaceState = history.replaceState.bind(history);
+  history.replaceState = function (...args) {
+    originalReplaceState(...args);
+    trackPageView();
+  };
+  window.addEventListener("popstate", trackPageView);
+  trackPageView();
+}
+</script>
+  </head>
+  <body class="EIlDfe">
+    <div id="root"></div>
+  </body>
+</html>

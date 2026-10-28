@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { ExternalLink } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { isOtherUnlocked, unlockOther } from "@/lib/otherTool";
+import ImageHost from "@/components/tools/ImageHost";
 import { inputCls, labelCls, cardCls, btnCls } from "@/lib/toolUi";
 
 const SIZES = [200, 300, 400, 600];
@@ -18,14 +18,15 @@ export default function QrGenerator() {
   const [margin, setMargin] = useState(2);
   const [fg, setFg] = useState("000000");
   const [bg, setBg] = useState("ffffff");
-  const navigate = useNavigate();
+  const [unlocked, setUnlocked] = useState(() => isOtherUnlocked());
   const lastTried = useRef("");
 
-  // Quiet hand-off: typing the private access code into the text field unlocks
-  // the hidden image host and opens it. Nothing is shown when it doesn't match.
+  // Typing the private access code into the text field reveals the image host
+  // right here. The code itself lives only as a salted hash on the server, so a
+  // wrong entry looks exactly like any other text — nothing is shown.
   useEffect(() => {
     const candidate = text.trim();
-    if (mode !== "text" || isOtherUnlocked()) return;
+    if (mode !== "text" || unlocked) return;
     if (candidate.length < 6 || candidate.length > 80 || candidate === lastTried.current) return;
     const timer = setTimeout(async () => {
       lastTried.current = candidate;
@@ -33,14 +34,14 @@ export default function QrGenerator() {
         const res = await base44.functions.invoke("verifyOtherCode", { code: candidate });
         if (Boolean(res?.ok ?? res?.data?.ok)) {
           unlockOther();
-          navigate("/tools/image-host");
+          setUnlocked(true);
         }
       } catch {
         /* wrong code or offline — stay silent */
       }
     }, 500);
     return () => clearTimeout(timer);
-  }, [text, mode, navigate]);
+  }, [text, mode, unlocked]);
 
   const data = (() => {
     if (mode === "text") return text;
@@ -156,6 +157,8 @@ export default function QrGenerator() {
       <p className="text-xs text-muted-foreground leading-relaxed">
         Higher error correction (Q, H) survives scratches and logos at the cost of density. Wi-Fi codes let phones join a network with one scan.
       </p>
+
+      {unlocked && <ImageHost />}
     </div>
   );
 }

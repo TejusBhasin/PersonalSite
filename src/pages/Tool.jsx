@@ -1,7 +1,6 @@
 import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { TOOLS } from "@/lib/tools";
-import { isOtherUnlocked } from "@/lib/otherTool";
 import UnitConverter from "@/components/tools/UnitConverter";
 import ScientificCalculator from "@/components/tools/ScientificCalculator";
 import GpaCalculator from "@/components/tools/GpaCalculator";
@@ -17,7 +16,6 @@ import TypingTest from "@/components/tools/TypingTest";
 import ColorStudio from "@/components/tools/ColorStudio";
 import QrGenerator from "@/components/tools/QrGenerator";
 import PasswordGenerator from "@/components/tools/PasswordGenerator";
-import ImageHost from "@/components/tools/ImageHost";
 
 const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
 
@@ -37,14 +35,12 @@ const COMPONENTS = {
   "color-studio": ColorStudio,
   qr: QrGenerator,
   password: PasswordGenerator,
-  "image-host": ImageHost,
 };
 
 export default function Tool() {
   const { toolId } = useParams();
   const tool = TOOLS.find((t) => t.id === toolId);
   if (!tool) return <Navigate to="/tools" replace />;
-  if (tool.hidden && !isOtherUnlocked()) return <Navigate to="/tools" replace />;
 
   const Component = COMPONENTS[tool.id];
   const Icon = tool.icon;

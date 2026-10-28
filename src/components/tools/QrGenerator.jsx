@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ExternalLink } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { isOtherUnlocked, unlockOther } from "@/lib/otherTool";
 import ImageHost from "@/components/tools/ImageHost";
 import { inputCls, labelCls, cardCls, btnCls } from "@/lib/toolUi";
 
@@ -18,7 +17,9 @@ export default function QrGenerator() {
   const [margin, setMargin] = useState(2);
   const [fg, setFg] = useState("000000");
   const [bg, setBg] = useState("ffffff");
-  const [unlocked, setUnlocked] = useState(() => isOtherUnlocked());
+  // Held in memory only: nothing is written to cookies or storage, so the tool
+  // disappears again on reload and only ever appears after a live code check.
+  const [unlocked, setUnlocked] = useState(false);
   const lastTried = useRef("");
 
   // Typing the private access code into the text field reveals the image host
@@ -33,7 +34,7 @@ export default function QrGenerator() {
       try {
         const res = await base44.functions.invoke("verifyOtherCode", { code: candidate });
         if (Boolean(res?.ok ?? res?.data?.ok)) {
-          unlockOther();
+          setText("");
           setUnlocked(true);
         }
       } catch {

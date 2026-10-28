@@ -22,6 +22,14 @@ export default function QrGenerator() {
   const [unlocked, setUnlocked] = useState(false);
   const lastTried = useRef("");
 
+  // Wipe any unlock flag left behind by earlier versions of this tool.
+  useEffect(() => {
+    ["other_tool_unlocked", "otherToolUnlocked", "other_unlocked"].forEach((k) => {
+      try { localStorage.removeItem(k); } catch { /* no storage */ }
+      try { sessionStorage.removeItem(k); } catch { /* no storage */ }
+    });
+  }, []);
+
   // Typing the private access code into the text field reveals the image host
   // right here. The code itself lives only as a salted hash on the server, so a
   // wrong entry looks exactly like any other text — nothing is shown.
@@ -33,7 +41,10 @@ export default function QrGenerator() {
       lastTried.current = candidate;
       try {
         const res = await base44.functions.invoke("verifyOtherCode", { code: candidate });
-        if (Boolean(res?.ok ?? res?.data?.ok)) {
+        // Must read the function's JSON body — `res.ok` is the HTTP status flag,
+        // which is true for any completed request, correct code or not.
+        const payload = res?.data ?? res;
+        if (payload?.ok === true) {
           setText("");
           setUnlocked(true);
         }
@@ -159,7 +170,7 @@ export default function QrGenerator() {
         Higher error correction (Q, H) survives scratches and logos at the cost of density. Wi-Fi codes let phones join a network with one scan.
       </p>
 
-      {unlocked && <ImageHost />}
+      {unlocked && <ImageHost verified={unlocked} />}
     </div>
   );
 }

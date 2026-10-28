@@ -15,7 +15,12 @@ function readLinks() {
   }
 }
 
-export default function ImageHost() {
+export default function ImageHost({ verified }) {
+  if (!verified) return null;
+  return <ImageHostInner />;
+}
+
+function ImageHostInner() {
   const [links, setLinks] = useState(readLinks);
   const [uploading, setUploading] = useState(0);
   const [failed, setFailed] = useState([]);

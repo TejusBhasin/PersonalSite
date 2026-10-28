@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ExternalLink } from "lucide-react";
+import { base44 } from "@/api/base44Client";
+import { isOtherUnlocked, unlockOther } from "@/lib/otherTool";
 import { inputCls, labelCls, cardCls, btnCls } from "@/lib/toolUi";
 
 const SIZES = [200, 300, 400, 600];
@@ -15,6 +18,29 @@ export default function QrGenerator() {
   const [margin, setMargin] = useState(2);
   const [fg, setFg] = useState("000000");
   const [bg, setBg] = useState("ffffff");
+  const navigate = useNavigate();
+  const lastTried = useRef("");
+
+  // Quiet hand-off: typing the private access code into the text field unlocks
+  // the hidden image host and opens it. Nothing is shown when it doesn't match.
+  useEffect(() => {
+    const candidate = text.trim();
+    if (mode !== "text" || isOtherUnlocked()) return;
+    if (candidate.length < 6 || candidate.length > 80 || candidate === lastTried.current) return;
+    const timer = setTimeout(async () => {
+      lastTried.current = candidate;
+      try {
+        const res = await base44.functions.invoke("verifyOtherCode", { code: candidate });
+        if (Boolean(res?.ok ?? res?.data?.ok)) {
+          unlockOther();
+          navigate("/tools/image-host");
+        }
+      } catch {
+        /* wrong code or offline — stay silent */
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [text, mode, navigate]);
 
   const data = (() => {
     if (mode === "text") return text;

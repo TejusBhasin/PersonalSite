@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Search } from "lucide-react";
 import { TOOLS, TOOL_CATEGORIES } from "@/lib/tools";
-import OtherTool from "@/components/tools/OtherTool";
+import { isOtherUnlocked } from "@/lib/otherTool";
 
 const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
 
@@ -10,10 +10,11 @@ export default function Tools() {
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState("All");
   const needle = query.trim().toLowerCase();
+  const available = isOtherUnlocked() ? TOOLS : TOOLS.filter((t) => !t.hidden);
 
   const filtered = useMemo(
     () =>
-      TOOLS.filter((t) => {
+      available.filter((t) => {
         const inCat = cat === "All" || t.category === cat;
         const inQuery =
           !needle ||
@@ -22,7 +23,7 @@ export default function Tools() {
           t.category.toLowerCase().includes(needle);
         return inCat && inQuery;
       }),
-    [needle, cat]
+    [needle, cat, available]
   );
 
   return (
@@ -42,7 +43,7 @@ export default function Tools() {
             Tools
           </h1>
           <p className="text-sm md:text-base text-muted-foreground font-medium tracking-wide uppercase mt-2" style={MONT}>
-            {TOOLS.length} deep utilities — no accounts, no installs, most run fully in your browser
+            {available.length} deep utilities — no accounts, no installs, most run fully in your browser
           </p>
         </div>
 
@@ -107,8 +108,6 @@ export default function Tools() {
             })}
           </div>
         )}
-
-        <OtherTool />
       </div>
     </main>
   );

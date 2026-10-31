@@ -1,12 +1,14 @@
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ExternalLink } from "lucide-react";
-import { GAMES, gameEmbedUrl } from "@/lib/games";
+import { GAMES, gameEmbedUrl, isBuiltinGame } from "@/lib/games";
+import SkiSlope from "@/components/games/SkiSlope";
 
 const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
 
 export default function PlayGame() {
   const { slug } = useParams();
   const game = GAMES.find((g) => g.slug === slug);
+  const builtin = !!game && isBuiltinGame(game.slug);
 
   if (!game) {
     return (
@@ -40,21 +42,29 @@ export default function PlayGame() {
         <h1 className="text-sm sm:text-base font-black tracking-wide truncate" style={MONT}>
           {game.name}
         </h1>
-        <a
-          href={gameEmbedUrl(game.slug)}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Open game in a new tab"
-          className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
-        >
-          <ExternalLink className="w-4 h-4" />
-        </a>
+        {!builtin && (
+          <a
+            href={gameEmbedUrl(game.slug)}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open game in a new tab"
+            className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
+          >
+            <ExternalLink className="w-4 h-4" />
+          </a>
+        )}
       </div>
-      <iframe
-        src={gameEmbedUrl(game.slug)}
-        title={game.name}
-        className="flex-1 w-full"
-      />
+      {builtin ? (
+        <div className="flex-1 w-full overflow-hidden">
+          <SkiSlope />
+        </div>
+      ) : (
+        <iframe
+          src={gameEmbedUrl(game.slug)}
+          title={game.name}
+          className="flex-1 w-full"
+        />
+      )}
     </div>
   );
 }

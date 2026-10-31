@@ -1,3 +1,5 @@
+import CreditsBox from "@/components/terms/CreditsBox";
+
 const TEXT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
 
 const Section = ({ title, children }) => (
@@ -30,6 +32,7 @@ export default function Terms() {
         <p>Questions? Email tejusbhasin17@gmail.com.</p>
       </Section>
       <p className="text-xs text-muted-foreground">Last updated: October 2026</p>
+      <CreditsBox />
     </main>
   );
 }

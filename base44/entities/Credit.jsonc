@@ -1,0 +1,43 @@
+{
+  "name": "Credit",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name displayed inside the credit box"
+    },
+    "subtitle": {
+      "type": "string",
+      "description": "A short line shown under the name"
+    },
+    "sort_order": {
+      "type": "integer",
+      "default": 0
+    },
+    "visible": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

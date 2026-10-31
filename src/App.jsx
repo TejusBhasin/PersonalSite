@@ -19,7 +19,6 @@ import Games from './pages/Games';
 import PlayGame from './pages/PlayGame';
 import Visits from './pages/Visits';
 import Devlog from './pages/Devlog';
-import Proof from './pages/Proof';
 import Tools from './pages/Tools';
 import Tool from './pages/Tool';
 import VisitTracker from './components/VisitTracker';
@@ -56,7 +55,6 @@ const AuthenticatedApp = () => {
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/devlog" element={<Devlog />} />
-        <Route path="/proof" element={<Proof />} />
         <Route path="/photo-album" element={<PhotoAlbum />} />
         <Route path="/visits" element={<Visits />} />
         <Route path="/games" element={<Games />} />

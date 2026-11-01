@@ -3,9 +3,14 @@
 // download / "open in Drive" affordances. Google renders the embedded folder as
 // plain HTML, so the file ids and names are read from that markup and the
 // pictures themselves are served from Google's public image CDN.
+//
+// The folder id is not kept in code: it lives in a SiteText record
+// (key: drive_photos_folder_id), so it cannot be read out of the repository.
 
-const FOLDER_ID = "1-IZTBsJM0iz6aLq8JvlHuviEnE-LmqZ6";
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.54";
+
 const IMAGE = /\.(jpe?g|png|webp|gif|avif|heic)$/i;
+const VALID_ID = /^[A-Za-z0-9_-]{10,80}$/;
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36";
 
@@ -19,8 +24,18 @@ const decode = (s) =>
 
 export default async function (req) {
   try {
+    const base44 = createClientFromRequest(req);
+    const { items } = await base44.asServiceRole.entities.SiteText.filter(
+      { key: "drive_photos_folder_id" },
+      { limit: 1 }
+    );
+    const folderId = (items?.[0]?.value || "").trim();
+    if (!VALID_ID.test(folderId)) {
+      return Response.json({ photos: [] });
+    }
+
     const res = await fetch(
-      `https://drive.google.com/embeddedfolderview?id=${FOLDER_ID}#grid`,
+      `https://drive.google.com/embeddedfolderview?id=${folderId}#grid`,
       { signal: AbortSignal.timeout(15000), headers: { "User-Agent": UA } }
     );
     if (!res.ok) {

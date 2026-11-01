@@ -111,6 +111,17 @@ export default function Footer() {
         </div>
 
         <LegalLinks className="mt-6 justify-center text-blue-400" />
+
+        <a
+          href="https://github.com/TopGamerTJ-TJ/PersonalSite"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-6 flex flex-wrap items-center justify-center gap-1.5 border-t border-background/20 pt-4 text-[11px] tracking-widest uppercase text-background/60 hover:text-background transition-colors duration-200"
+          style={{ fontFamily: "'Montserrat', system-ui, sans-serif" }}
+        >
+          <Github className="w-3.5 h-3.5" />
+          This site is open source — view it on GitHub here
+        </a>
       </div>
     </footer>
   );

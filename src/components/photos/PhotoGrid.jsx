@@ -22,7 +22,7 @@ export default function PhotoGrid({ photos, onOpen }) {
             onContextMenu={block}
             className="absolute inset-0 h-full w-full select-none object-cover transition-transform duration-500 group-hover:scale-105"
           />
-          <Watermark />
+          <Watermark variant="grid" />
         </button>
       ))}
     </div>

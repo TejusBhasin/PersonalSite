@@ -11,6 +11,11 @@ export default function RotationViewer({ photos, index, onIndex, onClose }) {
 
   useEffect(() => {
     const onKey = (e) => {
+      // Save / print shortcuts would hand out a copy of the picture.
+      if ((e.ctrlKey || e.metaKey) && ["s", "p"].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+        return;
+      }
       if (e.key === "ArrowRight") onIndex((index + 1) % total);
       else if (e.key === "ArrowLeft") onIndex((index - 1 + total) % total);
       else if (e.key === "Escape") onClose();
@@ -52,8 +57,8 @@ export default function RotationViewer({ photos, index, onIndex, onClose }) {
           <ChevronLeft className="h-6 w-6" />
         </button>
 
-        <div className="relative flex-1 h-full min-h-0 flex items-center justify-center">
-          <div className="relative max-h-full max-w-full">
+        <div className="flex-1 h-full min-h-0 flex items-center justify-center">
+          <div className="relative inline-block max-w-full max-h-full">
             <img
               key={photo.id}
               src={photo.full}
@@ -61,9 +66,9 @@ export default function RotationViewer({ photos, index, onIndex, onClose }) {
               draggable={false}
               onDragStart={block}
               onContextMenu={block}
-              className="max-h-[72vh] max-w-full select-none object-contain"
+              className="block max-h-[72vh] max-w-full select-none object-contain"
             />
-            <Watermark />
+            <Watermark variant="full" />
           </div>
         </div>
 

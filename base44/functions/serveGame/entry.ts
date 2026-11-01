@@ -1,5 +1,17 @@
 const GAMES_BASE = "https://rawcdn.githack.com/BinBashBanana/gfiles/master/gfiles/html5/";
 
+// Games that live on their own host instead of the shared mirror. Every entry is
+// pinned to a specific repo/path whose licence allows free use.
+const HOSTED = {
+  "duckhunt": "https://rawcdn.githack.com/MattSurabian/DuckHunt-JS/master/dist/index.html",
+  "floppybird": "https://nebez.github.io/floppybird/",
+  "hexgl": "https://hexgl.bkcore.com/play/",
+  "pacman": "https://passer-by.com/pacman/",
+  "skifree": "https://rawcdn.githack.com/basicallydan/skifree.js/master/index.html",
+  "snakes": "https://rawcdn.githack.com/jakesgordon/javascript-snakes/master/index.html",
+  "tetris": "https://rawcdn.githack.com/jakesgordon/javascript-tetris/master/index.html"
+};
+
 export default async function(req) {
   try {
     let slug = new URL(req.url).searchParams.get("slug");
@@ -18,7 +30,7 @@ export default async function(req) {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: GAMES_BASE + slug + "/index.html",
+        Location: HOSTED[slug] || GAMES_BASE + slug + "/index.html",
         "Cache-Control": "public, max-age=3600"
       }
     });

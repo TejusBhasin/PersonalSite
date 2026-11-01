@@ -443,9 +443,6 @@ export default function SkiSlope() {
             <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground" style={MONT}>
               Arrow keys or A/D to steer, or drag
             </p>
-            <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground/70" style={MONT}>
-              Recreation of the cork7 ski game · used with permission
-            </p>
           </div>
         </div>
       )}

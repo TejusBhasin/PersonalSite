@@ -2,13 +2,11 @@ import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { GAMES, gameEmbedUrl, isBuiltinGame } from "@/lib/games";
 import Skipro360 from "@/components/games/Skipro360";
-import OrbitDash from "@/components/games/OrbitDash";
 
 const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
 
 const BUILTIN_GAMES = {
   skipro360: Skipro360,
-  orbitdash: OrbitDash,
 };
 
 export default function PlayGame() {

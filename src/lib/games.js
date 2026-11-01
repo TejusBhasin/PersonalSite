@@ -4,9 +4,9 @@ export const GAME_SLUGS = [
   "chess", "chromaincident", "chromedino", "connect3", "cookieclicker",
   "edgenotfound", "evilglitch", "factoryballsforever", "flappybird",
   "geometrydash", "hextris", "konnekt", "minecraft", "ninjavsevilcorp",
-  "packabunchas", "pacman", "particleclicker", "pushback", "q1k3", "racer",
+  "orbitdash", "packabunchas", "pacman", "particleclicker", "pushback", "q1k3", "racer",
   "radiusraid", "retrohaunt", "roadblocks", "run3", "shuttledeck",
-  "skislope", "sleepingbeauty", "snake", "spacecompany", "spacegarden", "spacehuggers",
+  "skipro360", "sleepingbeauty", "snake", "spacecompany", "spacegarden", "spacehuggers",
   "tetris", "themazeofspacegoblins", "towermaster", "trimps", "underrun",
   "xx142-b2exe"
 ];
@@ -24,7 +24,8 @@ const NAME_OVERRIDES = {
   "captaincallisto": "Captain Callisto",
   "ninjavsevilcorp": "Ninja vs Evil Corp",
   "factoryballsforever": "Factory Balls Forever",
-  "skislope": "cork7 Ski Slope",
+  "skipro360": "SKIPRO360",
+  "orbitdash": "Orbit Dash",
   "chromaincident": "Chroma Incident"
 };
 
@@ -39,5 +40,5 @@ export const gameEmbedUrl = (slug) => `/functions/serveGame?slug=${slug}`;
 
 // Built-in games ship with the site itself and run as React components,
 // so they work on networks that block external game hosts.
-const BUILTIN_GAMES = ["skislope"];
+const BUILTIN_GAMES = ["skipro360", "orbitdash"];
 export const isBuiltinGame = (slug) => BUILTIN_GAMES.includes(slug);

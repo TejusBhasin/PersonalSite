@@ -1,14 +1,20 @@
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { GAMES, gameEmbedUrl, isBuiltinGame } from "@/lib/games";
-import SkiSlope from "@/components/games/SkiSlope";
+import Skipro360 from "@/components/games/Skipro360";
+import OrbitDash from "@/components/games/OrbitDash";
 
 const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
+
+const BUILTIN_GAMES = {
+  skipro360: Skipro360,
+  orbitdash: OrbitDash,
+};
 
 export default function PlayGame() {
   const { slug } = useParams();
   const game = GAMES.find((g) => g.slug === slug);
-  const builtin = !!game && isBuiltinGame(game.slug);
+  const Builtin = isBuiltinGame(slug) ? BUILTIN_GAMES[slug] : null;
 
   if (!game) {
     return (
@@ -42,7 +48,7 @@ export default function PlayGame() {
         <h1 className="text-sm sm:text-base font-black tracking-wide truncate" style={MONT}>
           {game.name}
         </h1>
-        {!builtin && (
+        {!Builtin && (
           <a
             href={gameEmbedUrl(game.slug)}
             target="_blank"
@@ -54,9 +60,9 @@ export default function PlayGame() {
           </a>
         )}
       </div>
-      {builtin ? (
+      {Builtin ? (
         <div className="flex-1 w-full overflow-hidden">
-          <SkiSlope />
+          <Builtin />
         </div>
       ) : (
         <iframe

@@ -1,0 +1,45 @@
+{
+  "name": "GameScore",
+  "type": "object",
+  "properties": {
+    "game": {
+      "type": "string",
+      "description": "Game slug the score belongs to, e.g. 'skipro360'"
+    },
+    "name": {
+      "type": "string",
+      "description": "Player tag shown on the leaderboard"
+    },
+    "score": {
+      "type": "integer",
+      "description": "Final score of the run"
+    },
+    "difficulty": {
+      "type": "string",
+      "description": "Difficulty the run was played on"
+    },
+    "stats": {
+      "type": "string",
+      "description": "Short JSON summary of the run (coins, gates, tricks, distance, time)"
+    }
+  },
+  "required": [
+    "game",
+    "name",
+    "score"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

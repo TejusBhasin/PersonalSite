@@ -10,7 +10,7 @@ const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
 export default function PhotoAlbum() {
   const [photos, setPhotos] = useState(null);
   const [rotation, setRotation] = useState(null);
-  const [flipped, setFlipped] = useState(false);
+  const [flipped, setFlipped] = useState(true);
   // Whatever order the album comes in, this flips it end to end.
   const ordered = photos ? (flipped ? [...photos].reverse() : photos) : null;
 

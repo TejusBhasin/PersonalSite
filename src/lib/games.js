@@ -24,7 +24,7 @@ const NAME_OVERRIDES = {
   "captaincallisto": "Captain Callisto",
   "ninjavsevilcorp": "Ninja vs Evil Corp",
   "factoryballsforever": "Factory Balls Forever",
-  "skislope": "Ski Slope",
+  "skislope": "cork7 Ski Slope",
   "chromaincident": "Chroma Incident"
 };
 

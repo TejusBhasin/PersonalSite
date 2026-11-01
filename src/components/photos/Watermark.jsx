@@ -12,8 +12,7 @@ const TEXT = {
   fontWeight: 700,
   fontSize: 12,
   letterSpacing: "0.3em",
-  color: "rgba(255,255,255,0.92)",
-  textShadow: "0 1px 4px rgba(0,0,0,0.8), 0 0 1px rgba(0,0,0,0.95)",
+  color: "rgba(255,255,255,0.5)",
   whiteSpace: "nowrap",
   userSelect: "none",
 };

@@ -411,10 +411,20 @@ export default function SkiSlope() {
         </div>
       </div>
 
+      <p
+        className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-black uppercase tracking-[0.45em] text-muted-foreground/50"
+        style={MONT}
+      >
+        cork7
+      </p>
+
       {status !== "playing" && (
         <div className="absolute inset-0 flex items-center justify-center bg-background/80 px-6 backdrop-blur-sm">
           <div className="w-full max-w-sm border border-border bg-card p-6 text-center">
-            <h2 className="text-xl font-black uppercase tracking-widest text-foreground" style={MONT}>
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground" style={MONT}>
+              cork7
+            </p>
+            <h2 className="mt-1 text-xl font-black uppercase tracking-widest text-foreground" style={MONT}>
               {status === "ready" ? "Ski Slope" : "Crashed"}
             </h2>
             <p className="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground" style={MONT}>
@@ -432,6 +442,9 @@ export default function SkiSlope() {
             </button>
             <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground" style={MONT}>
               Arrow keys or A/D to steer, or drag
+            </p>
+            <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground/70" style={MONT}>
+              Recreation of the cork7 ski game · used with permission
             </p>
           </div>
         </div>

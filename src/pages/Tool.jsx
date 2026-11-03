@@ -16,6 +16,7 @@ import TypingTest from "@/components/tools/TypingTest";
 import ColorStudio from "@/components/tools/ColorStudio";
 import QrGenerator from "@/components/tools/QrGenerator";
 import PasswordGenerator from "@/components/tools/PasswordGenerator";
+import Ytdpl from "@/components/tools/Ytdpl";
 
 const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
 
@@ -35,6 +36,7 @@ const COMPONENTS = {
   "color-studio": ColorStudio,
   qr: QrGenerator,
   password: PasswordGenerator,
+  "yt-dpl": Ytdpl,
 };
 
 export default function Tool() {

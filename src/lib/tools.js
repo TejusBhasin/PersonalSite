@@ -1,4 +1,4 @@
-import { Ruler, Calculator, KeyRound, QrCode, Timer, Layers, FileText, Palette, FileCode2, Braces, Regex, Binary, Fingerprint, Keyboard, GraduationCap } from "lucide-react";
+import { Ruler, Calculator, KeyRound, QrCode, Timer, Layers, FileText, Palette, FileCode2, Braces, Regex, Binary, Fingerprint, Keyboard, GraduationCap, Film } from "lucide-react";
 
 export const TOOLS = [
   { id: "unit-converter", name: "Unit Converter", icon: Ruler, category: "Math", description: "Convert across 10 measurement families with 60+ units, from millimeters to light-years." },
@@ -16,6 +16,7 @@ export const TOOLS = [
   { id: "color-studio", name: "Color Studio", icon: Palette, category: "Design", description: "Convert formats, generate harmonies and check WCAG contrast accessibility." },
   { id: "qr", name: "QR Code Studio", icon: QrCode, category: "Design", description: "Design QR codes with colors, error correction, margins and Wi-Fi presets." },
   { id: "password", name: "Password Forge", icon: KeyRound, category: "Security", description: "Passwords and passphrases with entropy math, crack-time estimates and bulk output." },
+  { id: "yt-dpl", name: "YT-DPL", icon: Film, category: "Media", description: "Private video vault — enter the access code to open it in place." },
 ];
 
-export const TOOL_CATEGORIES = ["All", "Math", "Text & Code", "Study", "Design", "Security"];
+export const TOOL_CATEGORIES = ["All", "Math", "Text & Code", "Study", "Design", "Security", "Media"];

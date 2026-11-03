@@ -25,7 +25,6 @@ import VisitTracker from './components/VisitTracker';
 import ContentGuard from './components/ContentGuard';
 import Invidious from './pages/Invidious';
 import Vidious from './pages/Vidious';
-import Ytdlp from './pages/Ytdlp';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -70,7 +69,6 @@ const AuthenticatedApp = () => {
       <Route path="/project/:slug" element={<ProjectDetail />} />
       <Route path="/invidious" element={<Invidious />} />
       <Route path="/vidious" element={<Vidious />} />
-      <Route path="/ytdlp" element={<Ytdlp />} />
       <Route path="/games/:slug" element={<PlayGame />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>

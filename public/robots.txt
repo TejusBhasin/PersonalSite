@@ -22,7 +22,6 @@ Allow: /
 User-agent: *
 Disallow: /invidious
 Disallow: /vidious
-Disallow: /ytdlp
 Allow: /
 
 Sitemap: https://tejusbhasin.info/sitemap.xml

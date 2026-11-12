@@ -2,22 +2,11 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { getDeviceId } from "@/lib/deviceId";
+import { fetchPublicIp } from "@/lib/publicIp";
 import ServerError from "@/pages/ServerError";
 
 const CACHE_KEY = "tejus_access_verdict";
 const CACHE_TTL = 5 * 60 * 1000;
-
-// Ask a public service what IP the browser is really browsing from.
-// The site itself may see a proxy IP, but this is the network's true public IP.
-async function fetchPublicIp() {
-  try {
-    const res = await fetch("https://api.ipify.org?format=json", { signal: AbortSignal.timeout(2000) });
-    const data = await res.json();
-    return data.ip || null;
-  } catch {
-    return null;
-  }
-}
 
 // Last known verdict, so repeat visits render instantly without waiting.
 function readCache() {

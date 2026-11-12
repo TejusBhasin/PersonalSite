@@ -28,11 +28,19 @@ export default async function(req) {
     const action = typeof body?.action === 'string' ? body.action : 'list';
 
     if (action === 'list') {
-      const visits = await base44.asServiceRole.entities.VisitLog.list(200);
-      const sorted = (visits || []).sort(
-        (a, b) => new Date(b.created_date).getTime() - new Date(a.created_date).getTime()
-      );
-      return Response.json({ ok: true, visits: sorted });
+      const page = await base44.asServiceRole.entities.VisitLog.list({ sort: '-created_date', limit: 150 });
+      const rows = Array.isArray(page) ? page : (page?.items || []);
+      const visits = rows.map((v) => ({
+          id: v.id,
+          created_date: v.created_date,
+          ip: v.ip,
+          client_ip: v.client_ip,
+          device_id: v.device_id,
+          path: v.path,
+          user_agent: (v.user_agent || '').slice(0, 120)
+        }))
+        .sort((a, b) => new Date(b.created_date).getTime() - new Date(a.created_date).getTime());
+      return Response.json({ ok: true, visits });
     }
 
     if (action === 'banDevice') {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Phone, Linkedin, Mail, Github, Award, BookOpen, Camera, Trophy, Users, Medal, School, Star, Plane, ArrowRight, Vote, Megaphone, Code, Globe, Landmark, Mic, Brain, GraduationCap, Lightbulb, Music, Palette, Rocket } from "lucide-react";
+import { Phone, Linkedin, Mail, Github, Award, BookOpen, Camera, Trophy, Users, Medal, School, Star, Plane, ArrowRight, Vote, Megaphone, Code, Globe, Landmark, Mic, Brain, GraduationCap, Lightbulb, Music, Palette, Rocket, FlaskConical, Atom, Microscope } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import LargeProjectsSection from "@/components/projects/LargeProjectsSection";
 import DebateAwardsCard from "@/components/awards/DebateAwardsCard";
@@ -9,17 +9,20 @@ import useSiteTexts from "@/hooks/useSiteTexts";
 
 const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
 const ICON_MAP = {
+  atom: Atom,
   award: Award,
   book: BookOpen,
   brain: Brain,
   camera: Camera,
   code: Code,
+  flask: FlaskConical,
   globe: Globe,
   landmark: Landmark,
   lightbulb: Lightbulb,
   medal: Medal,
   megaphone: Megaphone,
   mic: Mic,
+  microscope: Microscope,
   music: Music,
   palette: Palette,
   plane: Plane,

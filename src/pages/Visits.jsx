@@ -183,7 +183,7 @@ export default function Visits() {
                 <thead>
                   <tr className="bg-foreground text-background text-left" style={MONT}>
                     <th className="px-4 py-3 font-bold tracking-wide text-xs uppercase">Date</th>
-                    <th className="px-4 py-3 font-bold tracking-wide text-xs uppercase">Time</th>
+                    <th className="px-4 py-3 font-bold tracking-wide text-xs uppercase">Time (EST)</th>
                     <th className="px-4 py-3 font-bold tracking-wide text-xs uppercase">Real IP</th>
                     <th className="px-4 py-3 font-bold tracking-wide text-xs uppercase">Page</th>
                     <th className="px-4 py-3 font-bold tracking-wide text-xs uppercase">Browser</th>
@@ -194,10 +194,10 @@ export default function Visits() {
                   {visits.map((v) => (
                     <tr key={v.id} className="border-t border-border/60 odd:bg-card/50">
                       <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">
-                        {new Date(v.created_date).toLocaleDateString()}
+                        {new Date(v.created_date).toLocaleDateString("en-US", { timeZone: "America/New_York" })}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">
-                        {new Date(v.created_date).toLocaleTimeString()}
+                        {new Date(v.created_date).toLocaleTimeString("en-US", { timeZone: "America/New_York" })}
                       </td>
                       <td className="px-4 py-3 font-semibold text-foreground whitespace-nowrap">
                         {v.client_ip || v.ip}

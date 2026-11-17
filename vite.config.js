@@ -4,24 +4,42 @@ import { defineConfig } from 'vite'
 import fs from 'node:fs'
 import path from 'node:path'
 
-// Some @base44/sdk builds ship a client that imports "./modules/voice.js" without
-// including that file, which breaks the production build. This app never uses the
-// voice module, so resolve it to a harmless stub when the file is missing.
-const sdkVoiceFallback = {
-  name: 'base44-sdk-voice-fallback',
+// Some @base44/sdk builds ship a client that imports files the package forgot to
+// include (./utils/build-commit.js, ./modules/voice.js). Either one breaks the
+// production build on an unresolved import. This app does not use their behaviour,
+// so resolve a missing file to a harmless stub instead of failing the build.
+const SDK_FALLBACKS = {
+  'modules/voice.js': [
+    'export function createVoiceModule() {',
+    '  return {};',
+    '}',
+    'export default createVoiceModule;',
+  ].join('\n'),
+  'utils/build-commit.js': [
+    'export const BUILD_COMMIT_HEADER = "X-Base44-Build";',
+    'export function getBuildCommitHeaders() {',
+    '  return {};',
+    '}',
+  ].join('\n'),
+};
+
+const STUB_PREFIX = '\0base44-sdk-missing-file:';
+
+const sdkMissingFileFallback = {
+  name: 'base44-sdk-missing-file-fallback',
   enforce: 'pre',
   resolveId(source, importer) {
     if (!importer || !importer.includes('@base44/sdk')) return null;
-    if (source !== './modules/voice.js') return null;
-    const target = path.resolve(path.dirname(importer), 'modules', 'voice.js');
+    if (!source.startsWith('./')) return null;
+    const relative = source.slice(2);
+    if (!SDK_FALLBACKS[relative]) return null;
+    const target = path.resolve(path.dirname(importer), relative);
     if (fs.existsSync(target)) return null;
-    return '\0base44-sdk-voice-stub';
+    return STUB_PREFIX + relative;
   },
   load(id) {
-    if (id === '\0base44-sdk-voice-stub') {
-      return 'export const createVoiceModule = () => ({});\nexport default createVoiceModule;';
-    }
-    return null;
+    if (!id.startsWith(STUB_PREFIX)) return null;
+    return SDK_FALLBACKS[id.slice(STUB_PREFIX.length)];
   },
 };
 
@@ -29,7 +47,7 @@ const sdkVoiceFallback = {
 export default defineConfig({
   logLevel: 'error', // Suppress warnings, only show errors
   plugins: [
-    sdkVoiceFallback,
+    sdkMissingFileFallback,
     base44({
       // Support for legacy code that imports the base44 SDK with @/integrations, @/entities, etc.
       // can be removed if the code has been updated to use the new SDK imports from @base44/sdk

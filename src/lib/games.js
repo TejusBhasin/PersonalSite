@@ -45,5 +45,5 @@ export const gameEmbedUrl = (slug) => `/functions/serveGame?slug=${slug}`;
 
 // Built-in games ship with the site itself and run as React components,
 // so they work on networks that block external game hosts.
-const BUILTIN_GAMES = ["skipro360", "orbitdash"];
+const BUILTIN_GAMES = ["skipro360", "orbitdash", "chromedino"];
 export const isBuiltinGame = (slug) => BUILTIN_GAMES.includes(slug);

@@ -3,12 +3,14 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import { GAMES, gameEmbedUrl, isBuiltinGame } from "@/lib/games";
 import Skipro360 from "@/components/games/Skipro360";
 import OrbitDash from "@/components/games/OrbitDash";
+import DinoGame from "@/components/games/DinoGame";
 
 const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
 
 const BUILTIN_GAMES = {
   skipro360: Skipro360,
   orbitdash: OrbitDash,
+  chromedino: DinoGame,
 };
 
 export default function PlayGame() {

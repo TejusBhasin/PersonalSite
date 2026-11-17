@@ -5,6 +5,12 @@ import { GAMES } from "@/lib/games";
 
 const MONT = { fontFamily: "'Montserrat', system-ui, sans-serif" };
 
+// The Chrome Dino card gets its own pastel green treatment.
+const CARD_TINT = {
+  chromedino:
+    "bg-emerald-100/80 border-emerald-300 hover:bg-emerald-100 hover:border-emerald-500",
+};
+
 export default function Games() {
   const [query, setQuery] = useState("");
   const needle = query.trim().toLowerCase();
@@ -55,7 +61,10 @@ export default function Games() {
               <Link
                 key={game.slug}
                 to={`/games/${game.slug}`}
-                className="group bg-card/80 backdrop-blur-sm border border-border/60 rounded-xl px-5 py-4 flex items-center justify-between gap-3 hover:-translate-y-1 hover:shadow-lg hover:border-foreground/30 hover:bg-card transition-all duration-300"
+                className={`group border rounded-xl px-5 py-4 flex items-center justify-between gap-3 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 ${
+                  CARD_TINT[game.slug] ||
+                  "bg-card/80 backdrop-blur-sm border-border/60 hover:border-foreground/30 hover:bg-card"
+                }`}
               >
                 <Gamepad2 className="w-5 h-5 shrink-0 text-foreground/50 group-hover:text-foreground transition-colors" />
                 <span

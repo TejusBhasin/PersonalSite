@@ -1,0 +1,50 @@
+{
+  "name": "DinoPlayer",
+  "type": "object",
+  "properties": {
+    "username": {
+      "type": "string",
+      "description": "The name the player signed up with"
+    },
+    "handle": {
+      "type": "string",
+      "description": "Lowercased username, used for lookups"
+    },
+    "password": {
+      "type": "string",
+      "description": "Player password, stored as typed (no hashing) as requested"
+    },
+    "best_score": {
+      "type": "integer",
+      "default": 0,
+      "description": "The player's best Chrome Dino run \u2014 also serves as their leaderboard entry"
+    }
+  },
+  "required": [
+    "username",
+    "handle",
+    "password"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

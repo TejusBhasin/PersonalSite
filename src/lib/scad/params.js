@@ -61,7 +61,7 @@ function describe(name, rawValue, comment, section) {
     const range = hint.match(RANGE_RE);
     return {
       ...base,
-      type: Number.isInteger(value) ? "integer" : "number",
+      type: !rawValue.includes(".") && Number.isInteger(value) ? "integer" : "number",
       default_value: String(value),
       min_value: range ? Number(range[1]) : Math.max(0, round(value * 0.25)),
       max_value: range ? Number(range[3]) : round(Math.max(value * 3, value + 10)),

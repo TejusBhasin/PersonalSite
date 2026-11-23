@@ -74,16 +74,21 @@ export default function ScadSlice() {
   }, [projectId]);
 
   const [compiled, setCompiled] = useState(null);
+  const [compiling, setCompiling] = useState(false);
 
   useEffect(() => {
     if (!project?.source_code) return undefined;
     let alive = true;
+    setCompiling(true);
     compileOpenScad(project.source_code)
       .then((result) => {
         if (alive) setCompiled(result);
       })
       .catch(() => {
         if (alive) setCompiled(null);
+      })
+      .finally(() => {
+        if (alive) setCompiling(false);
       });
     return () => {
       alive = false;
@@ -213,7 +218,13 @@ export default function ScadSlice() {
               </p>
             )}
 
-            {!compiled?.geoms?.length && (
+            {compiling && (
+              <p className="mt-2 text-[11px] text-[color:var(--scad-muted)]">
+                Compiling the model with OpenSCAD…
+              </p>
+            )}
+
+            {!compiling && !compiled?.geoms?.length && (
               <p className="mt-2 flex items-start gap-1.5 text-[11px] leading-relaxed" style={{ color: "#ecc178" }}>
                 <TriangleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                 This source did not produce any solid geometry, so there is nothing to slice. Open it in

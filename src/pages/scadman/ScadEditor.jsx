@@ -386,7 +386,7 @@ export default function ScadEditor() {
         format: chosen.id,
         file_size: blob.size,
         triangles: compile.result?.stats?.triangles || 0,
-        engine: compile.result?.engine || "jscad-csg",
+        engine: compile.result?.engine || "openscad-wasm",
       }).catch(() => null);
     } catch (e) {
       notify(e.message || "Export failed.");

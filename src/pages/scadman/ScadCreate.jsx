@@ -211,8 +211,9 @@ export default function ScadCreate() {
             </p>
           )}
           <p className="mt-3 border-t pt-3 text-[10.5px] leading-relaxed text-[color:var(--scad-dim)]" style={{ borderColor: "var(--scad-line)" }}>
-            The assistant writes source only. Preview geometry comes from SCADman's built-in subset
-            engine, and exports stay disabled until a real OpenSCAD engine is connected.
+            The assistant writes source only. The editor compiles it with the real OpenSCAD kernel
+            (openscad-wasm) in your browser, so the preview, the parameters and the STL/3MF exports
+            all come from genuine geometry.
           </p>
         </div>
 

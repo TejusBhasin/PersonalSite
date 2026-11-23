@@ -13,9 +13,9 @@ const ROWS = [
   },
   {
     service: "Geometry engine",
-    detail: "JSCAD CSG kernel in the browser — real boolean maths on an OpenSCAD language subset",
+    detail: "Real OpenSCAD (openscad-wasm) compiled in the browser, the same engine as the official playground",
     status: "connected",
-    label: "csg",
+    label: "openscad",
   },
   {
     service: "STL export",

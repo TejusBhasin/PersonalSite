@@ -12,6 +12,7 @@ export default function ScadAiPanel({
   messages,
   pending,
   busy,
+  error,
   knowledge,
   onSend,
   onApply,
@@ -42,7 +43,7 @@ export default function ScadAiPanel({
         <Sparkles className="h-3.5 w-3.5" style={{ color: "var(--scad-accent)" }} />
         <span className="text-[11px] font-bold uppercase tracking-[0.14em]">Assistant</span>
         <div className="flex-1" />
-        <span className="scad-chip scad-chip-ok">live</span>
+        <span className="scad-chip">OpenSCAD</span>
       </div>
 
       <div ref={scrollRef} className="min-h-0 flex-1 space-y-3 overflow-y-auto px-3 py-3">
@@ -95,6 +96,24 @@ export default function ScadAiPanel({
             <span className="text-[10.5px] uppercase tracking-[0.12em] text-[color:var(--scad-dim)]">
               generating
             </span>
+          </div>
+        )}
+
+        {error && (
+          <div
+            className="rounded-md border px-2.5 py-2"
+            style={{ borderColor: "#4a2626", background: "#1a1113" }}
+          >
+            <p className="text-[9.5px] font-bold uppercase tracking-[0.14em]" style={{ color: "#f19a9a" }}>
+              assistant error
+            </p>
+            <p className="mt-1 text-[11px] leading-relaxed" style={{ color: "#f0b3b3" }}>
+              {error}
+            </p>
+            <button type="button" onClick={onRetry} className="scad-btn scad-btn-sm mt-2 w-full">
+              <RotateCcw className="h-3.5 w-3.5" />
+              Try again
+            </button>
           </div>
         )}
 

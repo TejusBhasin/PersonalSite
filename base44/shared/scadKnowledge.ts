@@ -187,6 +187,10 @@ export function buildPrompt({ request, code, history, parameters, diagnostics, k
 Rules:
 - Always return the COMPLETE final OpenSCAD source in "code", never a fragment, never a description instead of code.
 - Keep user-facing dimensions as variables at the top of the file, with comments.
+- Declare them in OpenSCAD Customizer syntax so the app can build controls automatically:
+  an optional "/* [Section] */" line, then "name = value; // Label [min:max]" for numbers
+  (mm in the label when it is a length), "// [option a, option b]" for strings, and plain
+  "name = true;" for booleans. Never hide a user-facing dimension inside a module.
 - Wrap the model in one module named build() and call build(); at the end.
 - Use meaningful names, derive dependent values, avoid magic numbers inside transforms.
 - When modifying an existing model, preserve every part of the existing geometry the user did not ask to change.

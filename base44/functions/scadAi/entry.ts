@@ -21,13 +21,29 @@ export default async function (req) {
 
     const knowledge = retrieveKnowledge(`${request} ${code.slice(0, 1500)}`, 4);
 
-    const llm = await base44.asServiceRole.integrations.Core.InvokeLLM({
-      prompt: buildPrompt({ request, code, history, parameters, diagnostics, knowledge }),
-      response_json_schema: RESPONSE_SCHEMA,
-    });
+    const prompt = buildPrompt({ request, code, history, parameters, diagnostics, knowledge });
+    const schema = RESPONSE_SCHEMA;
 
-    const parsed = typeof llm === "string" ? safeParse(llm) : llm;
-    if (!parsed || !parsed.code) {
+    let parsed = normalize(
+      await base44.asServiceRole.integrations.Core.InvokeLLM({
+        prompt,
+        response_json_schema: schema,
+      })
+    );
+
+    // One retry: the JSON sometimes comes back without source. Ask again, more bluntly.
+    if (!parsed?.code) {
+      parsed = normalize(
+        await base44.asServiceRole.integrations.Core.InvokeLLM({
+          prompt:
+            prompt +
+            "\n\nThe previous answer was unusable. Respond with JSON only, and the \"code\" field must contain the complete OpenSCAD source.",
+          response_json_schema: schema,
+        })
+      );
+    }
+
+    if (!parsed?.code) {
       return Response.json({ error: "The model did not return usable OpenSCAD source. Try rephrasing." }, { status: 502 });
     }
 
@@ -46,6 +62,12 @@ export default async function (req) {
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
+}
+
+function normalize(value) {
+  if (!value) return null;
+  if (typeof value === "object") return value;
+  return safeParse(String(value));
 }
 
 function safeParse(text) {

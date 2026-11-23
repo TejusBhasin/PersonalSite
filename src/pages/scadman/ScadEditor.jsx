@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -26,10 +26,10 @@ import {
   publishProject,
   replaceParameters,
   saveProject,
-  setParameterValue,
   snapshotVersion,
 } from "@/lib/scad/api";
-import { compileScad } from "@/lib/scad/engine";
+import { compileOpenScad } from "@/lib/scad/openscad";
+import { detectParameters, mergeParameters, parametersSignature } from "@/lib/scad/params";
 import { EXPORT_FORMATS, buildExport, downloadBlob } from "@/lib/scad/exportMesh";
 import useScadProfile from "@/hooks/useScadProfile";
 import ScadAiPanel from "@/components/scadman/ScadAiPanel";
@@ -37,7 +37,7 @@ import ScadCodeEditor from "@/components/scadman/ScadCodeEditor";
 import ScadViewport from "@/components/scadman/ScadViewport";
 import ScadParamPanel from "@/components/scadman/ScadParamPanel";
 import ScadPrintPanel from "@/components/scadman/ScadPrintPanel";
-import { applyParamToSource, extractVariables, formatBytes, timeAgo } from "@/lib/scad/format";
+import { applyParamToSource, formatBytes, timeAgo } from "@/lib/scad/format";
 
 export default function ScadEditor() {
   const { projectId } = useParams();
@@ -51,13 +51,14 @@ export default function ScadEditor() {
 
   const [code, setCode] = useState("");
   const [savedCode, setSavedCode] = useState("");
-  const [params, setParams] = useState([]);
+  const [storedParams, setStoredParams] = useState([]);
   const [versions, setVersions] = useState([]);
   const [messages, setMessages] = useState([]);
   const [conversationId, setConversationId] = useState(null);
   const [knowledge, setKnowledge] = useState(null);
 
   const [aiBusy, setAiBusy] = useState(false);
+  const [aiError, setAiError] = useState("");
   const [pending, setPending] = useState(null);
   const [lastPrompt, setLastPrompt] = useState("");
   const [compile, setCompile] = useState({ loading: false, result: null, error: "" });
@@ -72,9 +73,17 @@ export default function ScadEditor() {
 
   const editorRef = useRef(null);
   const paramsRef = useRef([]);
+  const storedRef = useRef([]);
+  const storedSignature = useRef("");
   const autoSent = useRef(false);
 
+  const params = useMemo(
+    () => mergeParameters(detectParameters(code), storedParams),
+    [code, storedParams]
+  );
+
   paramsRef.current = params;
+  storedRef.current = storedParams;
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 1280px)");
@@ -103,7 +112,10 @@ export default function ScadEditor() {
           base44.entities.ScadConversation.filter({ project_id: projectId }, { limit: 1 }),
         ]);
         if (!alive) return;
-        setParams(prm);
+        setStoredParams(prm);
+        storedSignature.current = parametersSignature(
+          mergeParameters(detectParameters(found.source_code || ""), prm)
+        );
         setVersions(vers);
         const convRows = Array.isArray(convs) ? convs : convs?.items || [];
         let conversation = convRows[0];
@@ -139,15 +151,26 @@ export default function ScadEditor() {
       setCompile({ loading: false, result: null, error: "" });
       return;
     }
+    let alive = true;
     setCompile((current) => ({ ...current, loading: true, error: "" }));
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       try {
-        setCompile({ loading: false, result: compileScad(code), error: "" });
+        const result = await compileOpenScad(code);
+        if (alive) setCompile({ loading: false, result, error: "" });
       } catch (e) {
-        setCompile({ loading: false, result: null, error: e.message });
+        if (alive) {
+          setCompile({
+            loading: false,
+            result: null,
+            error: e.message || "The OpenSCAD compiler could not start.",
+          });
+        }
       }
-    }, 400);
-    return () => clearTimeout(timer);
+    }, 350);
+    return () => {
+      alive = false;
+      clearTimeout(timer);
+    };
   }, [code]);
 
   const dirty = code !== savedCode;
@@ -157,11 +180,38 @@ export default function ScadEditor() {
     window.setTimeout(() => setNotice(""), 3500);
   }, []);
 
+  const syncParameters = useCallback(
+    async (nextCode, ...hints) => {
+      if (!project) return;
+      const detected = mergeParameters(detectParameters(nextCode), ...hints, storedRef.current);
+      const signature = parametersSignature(detected);
+      if (signature === storedSignature.current) return;
+      try {
+        const created = await replaceParameters(
+          project.id,
+          detected.map((p) => ({
+            ...p,
+            is_exposed: p.is_exposed !== false,
+            public: project.status === "published",
+          }))
+        );
+        const rows = Array.isArray(created) ? created : [];
+        setStoredParams(rows);
+        storedRef.current = rows;
+        storedSignature.current = signature;
+      } catch (e) {
+        notify(e.message || "Could not store the parameters.");
+      }
+    },
+    [project, notify]
+  );
+
   const persist = useCallback(
-    async (nextCode, description) => {
+    async (nextCode, description, options = {}) => {
       if (!project) return;
       setSaveState("saving");
       try {
+        if (options.syncParams) await syncParameters(nextCode, options.hints || []);
         await saveProject(project, nextCode);
         await snapshotVersion(project, nextCode, paramsRef.current, description);
         setSavedCode(nextCode);
@@ -173,7 +223,7 @@ export default function ScadEditor() {
         notify(e.message || "Could not save.");
       }
     },
-    [project, notify]
+    [project, notify, syncParameters]
   );
 
   useEffect(() => {
@@ -199,6 +249,7 @@ export default function ScadEditor() {
       setAiBusy(true);
       setLastPrompt(text);
       setPending(null);
+      setAiError("");
       const localId = `local-${Date.now()}`;
       setMessages((list) => [...list, { id: localId, role: "user", content: text }]);
       try {
@@ -249,8 +300,7 @@ export default function ScadEditor() {
           }).catch(() => null);
         }
       } catch (e) {
-        notify(e.message || "The assistant could not respond.");
-        setMessages((list) => list.filter((m) => m.id !== localId));
+        setAiError(e.message || "The assistant could not respond.");
       } finally {
         setAiBusy(false);
       }
@@ -271,60 +321,38 @@ export default function ScadEditor() {
     if (!pending || !project) return;
     const nextCode = pending.code;
     setCode(nextCode);
-    let nextParams = paramsRef.current;
-    if (pending.parameters?.length) {
-      try {
-        const created = await replaceParameters(
-          project.id,
-          pending.parameters.map((p, index) => ({
-            ...p,
-            is_exposed: true,
-            public: project.status === "published",
-            sort_order: index,
-          }))
-        );
-        nextParams = Array.isArray(created) ? created : [];
-        setParams(nextParams);
-      } catch (e) {
-        notify(e.message || "Could not store the parameters.");
-      }
-    }
     setPending(null);
-    await persist(nextCode, `AI: ${pending.title || pending.prompt}`.slice(0, 120));
-    notify("Applied. The editor now holds the new source.");
+    await persist(nextCode, `AI: ${pending.title || pending.prompt}`.slice(0, 120), {
+      syncParams: true,
+      hints: pending.parameters || [],
+    });
+    notify("Applied. Parameters were re-detected from the new source.");
   };
 
-  const changeParam = async (param, value) => {
-    const nextCode = applyParamToSource(code, param.name, value);
-    setCode(nextCode);
-    setParams((list) =>
-      list.map((p) => (p.id === param.id ? { ...p, default_value: String(value) } : p))
-    );
-    if (param.id) await setParameterValue(param, value).catch(() => null);
+  const changeParam = (param, value) => {
+    setCode((current) => applyParamToSource(current, param.name, value));
   };
 
   const scanParameters = async () => {
-    const found = extractVariables(code);
+    const found = detectParameters(code);
     if (found.length === 0) {
-      notify("No top-level numeric variables found at the start of a line.");
+      notify("No top-level variables found. Declare them at the start of a line.");
       return;
     }
-    try {
-      const created = await replaceParameters(project.id, found);
-      setParams(Array.isArray(created) ? created : []);
-      notify(`${found.length} parameters picked up from the source.`);
-    } catch (e) {
-      notify(e.message || "Could not scan the source.");
-    }
+    storedSignature.current = "";
+    await syncParameters(code);
+    notify(`${found.length} parameters detected from the source.`);
   };
 
   const publish = async () => {
     try {
-      await publishProject(project, params);
+      await syncParameters(code);
+      const prm = await listParameters(project.id);
+      setStoredParams(prm);
+      storedRef.current = prm;
+      await publishProject(project, prm);
       const refreshed = await getProject(project.id);
       setProject(refreshed);
-      const prm = await listParameters(project.id);
-      setParams(prm);
       notify("Published. The model page is live.");
     } catch (e) {
       notify(e.message || "Could not publish.");
@@ -398,6 +426,7 @@ export default function ScadEditor() {
       messages={messages}
       pending={pending}
       busy={aiBusy}
+      error={aiError}
       knowledge={knowledge}
       onSend={runAi}
       onApply={applyPending}
@@ -437,7 +466,7 @@ export default function ScadEditor() {
                 Scan source for parameters
               </button>
               <p className="mt-1.5 text-[10px] leading-relaxed text-[color:var(--scad-dim)]">
-                Changes rewrite the matching assignment in the source, then recompile.
+                Detected from the source. Changing one rewrites that assignment and recompiles.
               </p>
             </div>
           </>
@@ -551,7 +580,7 @@ export default function ScadEditor() {
         </button>
         <button
           type="button"
-          onClick={() => persist(code, "Manual save")}
+          onClick={() => persist(code, "Manual save", { syncParams: true })}
           className="scad-btn scad-btn-sm"
           title="Save and snapshot a version"
         >
@@ -630,7 +659,14 @@ export default function ScadEditor() {
                 </div>
               )}
             </div>
-            <DiagnosticsBar errors={errors} warnings={warnings} error={compile.error} stats={compile.result?.stats} />
+            <DiagnosticsBar
+              errors={errors}
+              warnings={warnings}
+              error={compile.error}
+              stats={compile.result?.stats}
+              engineLabel={compile.result?.engineLabel}
+              loading={compile.loading}
+            />
           </div>
 
           <aside
@@ -655,7 +691,14 @@ export default function ScadEditor() {
             {pane === "preview" && <ScadViewport result={compile.result} loading={compile.loading} />}
             {pane === "params" && paramsPanel}
           </div>
-          <DiagnosticsBar errors={errors} warnings={warnings} error={compile.error} stats={compile.result?.stats} />
+          <DiagnosticsBar
+              errors={errors}
+              warnings={warnings}
+              error={compile.error}
+              stats={compile.result?.stats}
+              engineLabel={compile.result?.engineLabel}
+              loading={compile.loading}
+            />
           <nav
             className="grid grid-cols-4 border-t"
             style={{ borderColor: "var(--scad-line)", background: "var(--scad-panel)" }}
@@ -684,7 +727,7 @@ export default function ScadEditor() {
   );
 }
 
-function DiagnosticsBar({ errors, warnings, error, stats }) {
+function DiagnosticsBar({ errors, warnings, error, stats, engineLabel, loading }) {
   const [open, setOpen] = useState(false);
   const problem = errors[0] || null;
 
@@ -695,7 +738,7 @@ function DiagnosticsBar({ errors, warnings, error, stats }) {
     >
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-[9.5px] font-bold uppercase tracking-[0.14em] text-[color:var(--scad-dim)]">
-          built-in subset engine
+          {engineLabel || "OpenSCAD"}
         </span>
         {stats?.triangles > 0 && <span className="scad-chip">{stats.triangles} tris</span>}
         {errors.length > 0 ? (
@@ -710,7 +753,12 @@ function DiagnosticsBar({ errors, warnings, error, stats }) {
           </button>
         )}
         <span className="min-w-0 flex-1 truncate text-[10.5px]" style={{ color: problem ? "var(--scad-err)" : "var(--scad-dim)" }}>
-          {problem ? `Line ${problem.line || "?"}: ${problem.message}` : error || "Booleans are solved by the CSG kernel. Unsupported features are listed here."}
+          {problem
+            ? `Line ${problem.line || "?"}: ${problem.message}`
+            : error ||
+              (loading
+                ? "Compiling with OpenSCAD. The first run downloads the compiler once."
+                : "Compiled by the real OpenSCAD kernel. Warnings appear here.")}
         </span>
       </div>
       {open && warnings.length > 0 && (

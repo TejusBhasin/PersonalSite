@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, Download, Loader2, Printer, TriangleAlert } from "lucide-react";
 import { getProject } from "@/lib/scad/api";
-import { compileScad } from "@/lib/scad/engine";
+import { compileOpenScad } from "@/lib/scad/openscad";
 import { buildExport, downloadBlob } from "@/lib/scad/exportMesh";
 import { formatBytes } from "@/lib/scad/format";
 import {
@@ -73,7 +73,22 @@ export default function ScadSlice() {
     };
   }, [projectId]);
 
-  const compiled = useMemo(() => (project ? compileScad(project.source_code) : null), [project]);
+  const [compiled, setCompiled] = useState(null);
+
+  useEffect(() => {
+    if (!project?.source_code) return undefined;
+    let alive = true;
+    compileOpenScad(project.source_code)
+      .then((result) => {
+        if (alive) setCompiled(result);
+      })
+      .catch(() => {
+        if (alive) setCompiled(null);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [project]);
 
   useEffect(() => {
     if (state !== "missing") return undefined;

@@ -15,6 +15,8 @@ const COMPILER_URL = "https://cdn.jsdelivr.net/npm/openscad-wasm@0.0.4/openscad.
 
 const WORKER_SOURCE = `
 let factoryPromise = null;
+let apiPromise = null;
+let logSink = [];
 
 function loadFactory() {
   if (!factoryPromise) {
@@ -23,21 +25,41 @@ function loadFactory() {
   return factoryPromise;
 }
 
+// One compiler instance is reused across compiles; a crashed instance is thrown away.
+function getApi() {
+  if (!apiPromise) {
+    apiPromise = loadFactory()
+      .then((createOpenSCAD) =>
+        createOpenSCAD({
+          print: (line) => logSink.push(String(line)),
+          printErr: (line) => logSink.push(String(line)),
+        })
+      )
+      .then((module_) => (module_.getInstance ? module_.getInstance() : module_))
+      .catch((error) => {
+        apiPromise = null;
+        throw error;
+      });
+  }
+  return apiPromise;
+}
+
 async function compile(source) {
-  const createOpenSCAD = await loadFactory();
-  const logs = [];
-  const module_ = await createOpenSCAD({
-    print: (line) => logs.push(String(line)),
-    printErr: (line) => logs.push(String(line)),
-  });
-  const api = module_.getInstance ? module_.getInstance() : module_;
+  logSink = [];
+  const api = await getApi();
+  try {
+    api.FS.unlink("out.stl");
+  } catch (error) {
+    // nothing to clear
+  }
   api.FS.writeFile("model.scad", source);
   let exitCode = 0;
   try {
     exitCode = api.callMain(["model.scad", "--export-format", "binstl", "-o", "out.stl"]);
   } catch (error) {
     exitCode = -1;
-    logs.push("ERROR: " + (typeof error === "number" ? "the compiler stopped (" + error + ")" : String(error)));
+    apiPromise = null;
+    logSink.push("ERROR: " + (typeof error === "number" ? "the compiler stopped (" + error + ")" : String(error)));
   }
   let bytes = null;
   try {
@@ -45,7 +67,7 @@ async function compile(source) {
   } catch (error) {
     bytes = null;
   }
-  return { exitCode, logs, bytes };
+  return { exitCode, logs: logSink.slice(), bytes };
 }
 
 self.onmessage = async (event) => {
@@ -110,6 +132,11 @@ async function compileOnMainThread(source) {
     printErr: (line) => logs.push(String(line)),
   });
   const api = module_.getInstance ? module_.getInstance() : module_;
+  try {
+    api.FS.unlink("out.stl");
+  } catch (error) {
+    // nothing to clear
+  }
   api.FS.writeFile("model.scad", source);
   let exitCode = 0;
   try {

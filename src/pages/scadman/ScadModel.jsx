@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Copy, Heart, Pencil, Printer, Share2, TriangleAlert } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { base44 } from "@/api/base44Client";
 import { getProjectBySlug, listParameters, projectAction } from "@/lib/scad/api";
-import { compileScad } from "@/lib/scad/engine";
+import { compileOpenScad } from "@/lib/scad/openscad";
+import { detectParameters, mergeParameters } from "@/lib/scad/params";
 import { buildExport, downloadBlob } from "@/lib/scad/exportMesh";
 import ScadViewport from "@/components/scadman/ScadViewport";
 import ScadParamPanel from "@/components/scadman/ScadParamPanel";
@@ -63,15 +64,20 @@ export default function ScadModel() {
 
   useEffect(() => {
     if (!code.trim()) return;
+    let alive = true;
     setCompile((c) => ({ ...c, loading: true }));
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       try {
-        setCompile({ loading: false, result: compileScad(code) });
+        const result = await compileOpenScad(code);
+        if (alive) setCompile({ loading: false, result });
       } catch {
-        setCompile({ loading: false, result: null });
+        if (alive) setCompile({ loading: false, result: null });
       }
     }, 350);
-    return () => clearTimeout(timer);
+    return () => {
+      alive = false;
+      clearTimeout(timer);
+    };
   }, [code]);
 
   const changeParam = (param, value) => {
@@ -159,7 +165,7 @@ export default function ScadModel() {
     );
   }
 
-  const exposed = params.filter((p) => p.is_exposed !== false);
+  const exposed = mergeParameters(detectParameters(code), params).filter((p) => p.is_exposed !== false);
 
   return (
     <div className="scad-wrap">
@@ -228,7 +234,7 @@ export default function ScadModel() {
           <ScadViewport
             result={compile.result}
             loading={compile.loading}
-            emptyHint="This model produced no previewable geometry in the built-in subset engine."
+            emptyHint="OpenSCAD produced no geometry for this source."
           />
         </div>
 
@@ -240,7 +246,7 @@ export default function ScadModel() {
           <ScadParamPanel
             params={exposed}
             onChange={changeParam}
-            emptyHint="The creator did not expose parameters for this model."
+            emptyHint="This source declares no top-level parameters."
           />
           {compile.result?.diagnostics?.length > 0 && (
             <div className="border-t px-3 py-2" style={{ borderColor: "var(--scad-line)" }}>
@@ -334,9 +340,8 @@ export default function ScadModel() {
 
       <p className="mt-6 flex items-start gap-2 text-[10.5px] leading-relaxed text-[color:var(--scad-dim)]">
         <Pencil className="mt-0.5 h-3 w-3 shrink-0" />
-        Geometry is computed from the source by the JSCAD CSG kernel, so boolean cuts are real and
-        the mesh exports cleanly. It is not the official OpenSCAD compiler: anything it cannot
-        evaluate is reported above instead of being guessed.
+        Geometry is compiled by the real OpenSCAD kernel (openscad-wasm) in your browser, so every
+        boolean, hull and extrusion is exact and the mesh exports cleanly. Nothing is uploaded.
       </p>
     </div>
   );

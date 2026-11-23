@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Copy, Heart, Pencil, Share2, TriangleAlert } from "lucide-react";
+import { Copy, Heart, Pencil, Printer, Share2, TriangleAlert } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { base44 } from "@/api/base44Client";
 import { getProjectBySlug, listParameters, projectAction } from "@/lib/scad/api";
@@ -285,6 +285,14 @@ export default function ScadModel() {
         >
           Download 3MF
         </button>
+        <Link
+          to={`/scadman/slice/${project.id}`}
+          className="scad-btn scad-btn-primary"
+          title="Slice this model to G-code in your browser"
+        >
+          <Printer className="h-3.5 w-3.5" />
+          Slice to G-code
+        </Link>
         <span className="text-[10.5px] text-[color:var(--scad-dim)]">
           {compile.result?.stats?.triangles
             ? `${compile.result.stats.triangles} triangles ready to export`

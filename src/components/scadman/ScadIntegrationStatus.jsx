@@ -31,9 +31,9 @@ const ROWS = [
   },
   {
     service: "Slicer / G-code",
-    detail: "Print profiles and recommendations are live; slicing needs a slicer service",
-    status: "pending",
-    label: "not connected",
+    detail: "Kiri:Moto engine in the browser (MIT), options straight to G-code",
+    status: "connected",
+    label: "working",
   },
   {
     service: "Knowledge retrieval",

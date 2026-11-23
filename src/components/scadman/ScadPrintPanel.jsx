@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Printer, TriangleAlert } from "lucide-react";
+import { Printer } from "lucide-react";
 
 function recommendations(profile, sizeMm) {
   const nozzle = Number(profile?.nozzle_diameter) || 0.4;
@@ -19,7 +19,7 @@ function recommendations(profile, sizeMm) {
   return list;
 }
 
-export default function ScadPrintPanel({ profile, sizeMm, overrides, onEditProjectSettings }) {
+export default function ScadPrintPanel({ profile, sizeMm, overrides, onEditProjectSettings, projectId }) {
   const rows = [
     ["Printer", profile?.printer || "not set"],
     ["Nozzle", `${Number(profile?.nozzle_diameter) || 0.4} mm`],
@@ -74,22 +74,23 @@ export default function ScadPrintPanel({ profile, sizeMm, overrides, onEditProje
 
       <div
         className="rounded-md border p-2.5"
-        style={{ borderColor: "#4a3a1e", background: "#1a1610" }}
+        style={{ borderColor: "var(--scad-line-2)", background: "var(--scad-panel-2)" }}
       >
         <div className="flex items-center gap-1.5">
-          <TriangleAlert className="h-3.5 w-3.5" style={{ color: "#ecc178" }} />
-          <span className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: "#ecc178" }}>
-            G-code not available
-          </span>
+          <Printer className="h-3.5 w-3.5" style={{ color: "var(--scad-accent)" }} />
+          <span className="text-[10px] font-bold uppercase tracking-[0.12em]">Slice in the browser</span>
         </div>
         <p className="mt-1.5 text-[10.5px] leading-relaxed text-[color:var(--scad-muted)]">
-          Slicing needs a slicer service (PrusaSlicer, OrcaSlicer or Cura) connected on the server.
-          Colour changes, nozzle and infill settings are stored here and will be sent to it.
+          Layer height, walls, infill, supports and temperatures, sliced to G-code on your own machine.
         </p>
-        <button type="button" disabled className="scad-btn scad-btn-sm mt-2 w-full">
-          <Printer className="h-3.5 w-3.5" />
-          Generate G-code
-        </button>
+        {projectId ? (
+          <Link to={`/scadman/slice/${projectId}`} className="scad-btn scad-btn-primary scad-btn-sm mt-2 w-full">
+            <Printer className="h-3.5 w-3.5" />
+            Slice to G-code
+          </Link>
+        ) : (
+          <p className="mt-2 text-[10px] text-[color:var(--scad-dim)]">Save the project, then slice it.</p>
+        )}
       </div>
     </div>
   );

@@ -37,6 +37,7 @@ import ScadProjects from './pages/scadman/ScadProjects';
 import ScadEditor from './pages/scadman/ScadEditor';
 import ScadLibrary from './pages/scadman/ScadLibrary';
 import ScadModel from './pages/scadman/ScadModel';
+import ScadSlice from './pages/scadman/ScadSlice';
 import ScadFavorites from './pages/scadman/ScadFavorites';
 import ScadSettings from './pages/scadman/ScadSettings';
 // Add page imports here
@@ -91,6 +92,7 @@ const AuthenticatedApp = () => {
       <Route element={<ScadLayout />}>
         <Route path="/scadman/library" element={<ScadLibrary />} />
         <Route path="/scadman/library/:slug" element={<ScadModel />} />
+        <Route path="/scadman/slice/:projectId" element={<ScadSlice />} />
       </Route>
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/scadman/login" replace />} />}>
         <Route element={<ScadLayout />}>

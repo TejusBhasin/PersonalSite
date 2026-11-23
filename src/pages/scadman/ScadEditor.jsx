@@ -443,7 +443,11 @@ export default function ScadEditor() {
           </>
         )}
         {tab === "print" && (
-          <ScadPrintPanel profile={profile} sizeMm={compile.result?.stats?.sizeMm} />
+          <ScadPrintPanel
+            profile={profile}
+            sizeMm={compile.result?.stats?.sizeMm}
+            projectId={project?.id}
+          />
         )}
         {tab === "versions" && (
           <div className="p-3">

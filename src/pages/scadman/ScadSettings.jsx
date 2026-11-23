@@ -125,7 +125,7 @@ export default function ScadSettings() {
       <section className="scad-panel mt-3 p-4">
         <h2 className="scad-h3">Print defaults</h2>
         <p className="scad-body mt-1 text-[11px]">
-          Used for recommendations and for the G-code settings that will be sent to the slicer.
+          Used for the print recommendations shown next to each model.
         </p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <Field label="Printer">

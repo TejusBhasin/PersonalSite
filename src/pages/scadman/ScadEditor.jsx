@@ -20,7 +20,6 @@ import {
 import { base44 } from "@/api/base44Client";
 import {
   askAi,
-  compileSource,
   getProject,
   listParameters,
   listVersions,
@@ -30,13 +29,15 @@ import {
   setParameterValue,
   snapshotVersion,
 } from "@/lib/scad/api";
+import { compileScad } from "@/lib/scad/engine";
+import { EXPORT_FORMATS, buildExport, downloadBlob } from "@/lib/scad/exportMesh";
 import useScadProfile from "@/hooks/useScadProfile";
 import ScadAiPanel from "@/components/scadman/ScadAiPanel";
 import ScadCodeEditor from "@/components/scadman/ScadCodeEditor";
 import ScadViewport from "@/components/scadman/ScadViewport";
 import ScadParamPanel from "@/components/scadman/ScadParamPanel";
 import ScadPrintPanel from "@/components/scadman/ScadPrintPanel";
-import { applyParamToSource, extractVariables, timeAgo } from "@/lib/scad/format";
+import { applyParamToSource, extractVariables, formatBytes, timeAgo } from "@/lib/scad/format";
 
 export default function ScadEditor() {
   const { projectId } = useParams();
@@ -66,6 +67,8 @@ export default function ScadEditor() {
   const [tab, setTab] = useState("params");
   const [pane, setPane] = useState("code");
   const [wide, setWide] = useState(true);
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exporting, setExporting] = useState("");
 
   const editorRef = useRef(null);
   const paramsRef = useRef([]);
@@ -136,21 +139,16 @@ export default function ScadEditor() {
       setCompile({ loading: false, result: null, error: "" });
       return;
     }
-    let alive = true;
     setCompile((current) => ({ ...current, loading: true, error: "" }));
-    const timer = setTimeout(async () => {
+    const timer = setTimeout(() => {
       try {
-        const result = await compileSource(code, projectId);
-        if (alive) setCompile({ loading: false, result, error: "" });
+        setCompile({ loading: false, result: compileScad(code), error: "" });
       } catch (e) {
-        if (alive) setCompile({ loading: false, result: null, error: e.message });
+        setCompile({ loading: false, result: null, error: e.message });
       }
-    }, 650);
-    return () => {
-      alive = false;
-      clearTimeout(timer);
-    };
-  }, [code, projectId]);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [code]);
 
   const dirty = code !== savedCode;
 
@@ -344,6 +342,31 @@ export default function ScadEditor() {
     navigate("/scadman/projects");
   };
 
+  const exportAs = async (format) => {
+    const geoms = compile.result?.geoms || [];
+    if (!geoms.length) {
+      notify("Nothing to export yet — the model has not compiled.");
+      return;
+    }
+    setExporting(format);
+    try {
+      const { blob, filename, format: chosen } = buildExport(geoms, format, project.title);
+      downloadBlob(blob, filename);
+      notify(`${filename} · ${formatBytes(blob.size)}`);
+      base44.entities.ScadExport.create({
+        project_id: project.id,
+        format: chosen.id,
+        file_size: blob.size,
+        triangles: compile.result?.stats?.triangles || 0,
+        engine: compile.result?.engine || "jscad-csg",
+      }).catch(() => null);
+    } catch (e) {
+      notify(e.message || "Export failed.");
+    } finally {
+      setExporting("");
+    }
+  };
+
   if (state === "loading") {
     return (
       <div className="flex h-[60vh] items-center justify-center">
@@ -531,16 +554,38 @@ export default function ScadEditor() {
           <Save className="h-3.5 w-3.5" />
           Save
         </button>
-        <button
-          type="button"
-          onClick={() =>
-            notify("Export needs a connected OpenSCAD engine. Nothing was downloaded.")
-          }
-          className="scad-btn scad-btn-sm"
-          title="Export STL / 3MF (needs the OpenSCAD engine)"
-        >
-          <Download className="h-3.5 w-3.5" />
-        </button>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setExportOpen((open) => !open)}
+            disabled={!compile.result?.geoms?.length || Boolean(exporting)}
+            className="scad-btn scad-btn-sm"
+            title="Export STL / 3MF"
+          >
+            <Download className="h-3.5 w-3.5" />
+            {exporting ? "…" : ""}
+          </button>
+          {exportOpen && (
+            <div
+              className="absolute right-0 top-9 z-50 w-44 rounded-md border p-1"
+              style={{ borderColor: "var(--scad-line-2)", background: "var(--scad-panel-2)" }}
+            >
+              {EXPORT_FORMATS.map((format) => (
+                <button
+                  key={format.id}
+                  type="button"
+                  onClick={() => {
+                    setExportOpen(false);
+                    exportAs(format.id);
+                  }}
+                  className="block w-full rounded px-2 py-1.5 text-left text-[11px] font-semibold text-[color:var(--scad-muted)] hover:bg-[color:var(--scad-panel-3)] hover:text-[color:var(--scad-text)]"
+                >
+                  {format.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         {project.status === "published" ? (
           <Link to={`/scadman/library/${project.slug}`} className="scad-btn scad-btn-sm">
             <ExternalLink className="h-3.5 w-3.5" />
@@ -661,7 +706,7 @@ function DiagnosticsBar({ errors, warnings, error, stats }) {
           </button>
         )}
         <span className="min-w-0 flex-1 truncate text-[10.5px]" style={{ color: problem ? "var(--scad-err)" : "var(--scad-dim)" }}>
-          {problem ? `Line ${problem.line || "?"}: ${problem.message}` : error || "Booleans are drawn as outlines; connect OpenSCAD for exact CSG."}
+          {problem ? `Line ${problem.line || "?"}: ${problem.message}` : error || "Booleans are solved by the CSG kernel. Unsupported features are listed here."}
         </span>
       </div>
       {open && warnings.length > 0 && (

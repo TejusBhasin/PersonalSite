@@ -1,0 +1,50 @@
+{
+  "name": "ScadExport",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "format": {
+      "type": "string",
+      "enum": [
+        "stl-binary",
+        "stl-ascii",
+        "3mf"
+      ],
+      "enumColors": [
+        "blue",
+        "gray",
+        "green"
+      ]
+    },
+    "file_size": {
+      "type": "integer"
+    },
+    "triangles": {
+      "type": "integer"
+    },
+    "engine": {
+      "type": "string",
+      "default": "jscad-csg"
+    }
+  },
+  "required": [
+    "project_id",
+    "format"
+  ],
+  "rls": {
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}

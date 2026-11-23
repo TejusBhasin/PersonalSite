@@ -114,45 +114,34 @@ export default function ScadViewport({ result, loading, emptyHint }) {
       if (Array.isArray(child.material)) child.material.forEach((m) => m.dispose());
       else child.material?.dispose?.();
     }
-    if (!result || !result.solids) return;
 
-    for (const solid of result.solids) {
-      const geometry = new THREE.BufferGeometry();
-      geometry.setAttribute("position", new THREE.Float32BufferAttribute(solid.positions, 3));
-      geometry.setIndex(solid.indices);
-      geometry.computeVertexNormals();
+    const mesh = result?.mesh;
+    if (!mesh || !mesh.positions || mesh.positions.length === 0) return;
 
-      if (solid.op === "add") {
-        const mesh = new THREE.Mesh(
-          geometry,
-          new THREE.MeshStandardMaterial({
-            color: 0xd9e0ea,
-            metalness: 0.15,
-            roughness: 0.55,
-            side: THREE.DoubleSide,
-          })
-        );
-        mesh.userData.kind = "solid";
-        ctx.group.add(mesh);
-        const edges = new THREE.LineSegments(
-          new THREE.EdgesGeometry(geometry, 28),
-          new THREE.LineBasicMaterial({ color: 0x93a1b3, transparent: true, opacity: 0.35 })
-        );
-        ctx.group.add(edges);
-      } else {
-        const cut = new THREE.Mesh(
-          geometry,
-          new THREE.MeshBasicMaterial({
-            color: 0xe9b14c,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.4,
-          })
-        );
-        cut.userData.kind = "cut";
-        ctx.group.add(cut);
-      }
-    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.Float32BufferAttribute(mesh.positions, 3));
+    if (mesh.indices && mesh.indices.length) geometry.setIndex(mesh.indices);
+    geometry.computeVertexNormals();
+    geometry.computeBoundingSphere();
+
+    const solid = new THREE.Mesh(
+      geometry,
+      new THREE.MeshStandardMaterial({
+        color: 0xd9e0ea,
+        metalness: 0.18,
+        roughness: 0.52,
+        side: THREE.DoubleSide,
+      })
+    );
+    solid.userData.kind = "solid";
+    ctx.group.add(solid);
+
+    const edges = new THREE.LineSegments(
+      new THREE.EdgesGeometry(geometry, 30),
+      new THREE.LineBasicMaterial({ color: 0x93a1b3, transparent: true, opacity: 0.28 })
+    );
+    ctx.group.add(edges);
+
     ctx.fit();
   }, [result]);
 
@@ -178,7 +167,9 @@ export default function ScadViewport({ result, loading, emptyHint }) {
       <div ref={hostRef} className="h-full w-full" />
 
       <div className="pointer-events-none absolute left-3 top-3 flex flex-wrap items-center gap-1.5">
-        <span className="scad-chip scad-chip-warn">subset engine</span>
+        <span className={`scad-chip ${result?.ok ? "scad-chip-ok" : "scad-chip-warn"}`}>
+          {result?.engineLabel || "no geometry"}
+        </span>
         {stats?.triangles > 0 && <span className="scad-chip">{stats.triangles} tris</span>}
         {stats?.sizeMm && (
           <span className="scad-chip">
@@ -223,13 +214,13 @@ export default function ScadViewport({ result, loading, emptyHint }) {
           <div className="flex items-center gap-3">
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#2e3846] border-t-[#e9b14c]" />
             <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[color:var(--scad-muted)]">
-              evaluating geometry
+              solving geometry
             </span>
           </div>
         </div>
       )}
 
-      {!loading && !result && (
+      {!loading && !result?.mesh && (
         <div className="absolute inset-0 flex items-center justify-center px-6 text-center">
           <p className="max-w-[34ch] text-[12px] leading-relaxed text-[color:var(--scad-dim)]">
             {emptyHint || "Nothing compiled yet. Edit the source or ask the assistant for a model."}

@@ -104,7 +104,7 @@ export default function ScadLanding() {
               style={{ borderColor: "var(--scad-line)" }}
             >
               <span className="scad-chip">phone_stand.scad</span>
-              <span className="scad-chip scad-chip-warn">subset preview</span>
+              <span className="scad-chip scad-chip-ok">live CSG</span>
               <div className="flex-1" />
               <span className="scad-mono text-[10px] text-[color:var(--scad-dim)]">
                 78 × 92 × 64 mm

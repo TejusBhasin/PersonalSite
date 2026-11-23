@@ -3,11 +3,13 @@ import { Link, useParams } from "react-router-dom";
 import { Copy, Heart, Pencil, Share2, TriangleAlert } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { base44 } from "@/api/base44Client";
-import { compileSource, getProjectBySlug, listParameters, projectAction } from "@/lib/scad/api";
+import { getProjectBySlug, listParameters, projectAction } from "@/lib/scad/api";
+import { compileScad } from "@/lib/scad/engine";
+import { buildExport, downloadBlob } from "@/lib/scad/exportMesh";
 import ScadViewport from "@/components/scadman/ScadViewport";
 import ScadParamPanel from "@/components/scadman/ScadParamPanel";
 import ScadCodeEditor from "@/components/scadman/ScadCodeEditor";
-import { LICENSE_SHORT, applyParamToSource, canRemix, categoryLabel, formatDate } from "@/lib/scad/format";
+import { LICENSE_SHORT, applyParamToSource, canRemix, categoryLabel, formatBytes, formatDate } from "@/lib/scad/format";
 
 export default function ScadModel() {
   const { slug } = useParams();
@@ -21,6 +23,7 @@ export default function ScadModel() {
   const [favorited, setFavorited] = useState(false);
   const [favoriteCount, setFavoriteCount] = useState(0);
   const [showSource, setShowSource] = useState(false);
+  const [exporting, setExporting] = useState("");
   const [notice, setNotice] = useState("");
 
   useEffect(() => {
@@ -60,21 +63,16 @@ export default function ScadModel() {
 
   useEffect(() => {
     if (!code.trim()) return;
-    let alive = true;
     setCompile((c) => ({ ...c, loading: true }));
-    const timer = setTimeout(async () => {
+    const timer = setTimeout(() => {
       try {
-        const result = await compileSource(code, project?.id);
-        if (alive) setCompile({ loading: false, result });
-      } catch (e) {
-        if (alive) setCompile({ loading: false, result: null });
+        setCompile({ loading: false, result: compileScad(code) });
+      } catch {
+        setCompile({ loading: false, result: null });
       }
-    }, 500);
-    return () => {
-      alive = false;
-      clearTimeout(timer);
-    };
-  }, [code, project?.id]);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [code]);
 
   const changeParam = (param, value) => {
     setCode((current) => applyParamToSource(current, param.name, value));
@@ -107,6 +105,24 @@ export default function ScadModel() {
       window.location.assign(`/scadman/editor/${data.project.id}`);
     } catch (e) {
       setNotice(e.message);
+    }
+  };
+
+  const download = (format) => {
+    const geoms = compile.result?.geoms || [];
+    if (!geoms.length) {
+      setNotice("Nothing has compiled yet.");
+      return;
+    }
+    setExporting(format);
+    try {
+      const { blob, filename } = buildExport(geoms, format, project.title);
+      downloadBlob(blob, filename);
+      setNotice(`${filename} · ${formatBytes(blob.size)}`);
+    } catch (e) {
+      setNotice(e.message || "Export failed.");
+    } finally {
+      setExporting("");
     }
   };
 
@@ -251,14 +267,28 @@ export default function ScadModel() {
           <Copy className="h-3.5 w-3.5" />
           Copy code
         </button>
-        <button type="button" disabled className="scad-btn" title="Requires an OpenSCAD render service">
+        <button
+          type="button"
+          onClick={() => download("stl-binary")}
+          disabled={!compile.result?.geoms?.length || Boolean(exporting)}
+          className="scad-btn"
+          title="Download a binary STL of the current geometry"
+        >
           Download STL
         </button>
-        <button type="button" disabled className="scad-btn" title="Requires a 3MF conversion service">
+        <button
+          type="button"
+          onClick={() => download("3mf")}
+          disabled={!compile.result?.geoms?.length || Boolean(exporting)}
+          className="scad-btn"
+          title="Download a 3MF package of the current geometry"
+        >
           Download 3MF
         </button>
         <span className="text-[10.5px] text-[color:var(--scad-dim)]">
-          Exports need a connected OpenSCAD engine. Nothing is downloaded until it exists.
+          {compile.result?.stats?.triangles
+            ? `${compile.result.stats.triangles} triangles ready to export`
+            : "Exports unlock once the model compiles"}
         </span>
       </div>
 
@@ -296,8 +326,9 @@ export default function ScadModel() {
 
       <p className="mt-6 flex items-start gap-2 text-[10.5px] leading-relaxed text-[color:var(--scad-dim)]">
         <Pencil className="mt-0.5 h-3 w-3 shrink-0" />
-        Preview geometry is produced by SCADman's built-in subset interpreter, which approximates
-        booleans. It is not the official OpenSCAD compiler.
+        Geometry is computed from the source by the JSCAD CSG kernel, so boolean cuts are real and
+        the mesh exports cleanly. It is not the official OpenSCAD compiler: anything it cannot
+        evaluate is reported above instead of being guessed.
       </p>
     </div>
   );

@@ -8,10 +8,6 @@ async function invoke(name, payload) {
   return data;
 }
 
-export function compileSource(source, projectId) {
-  return invoke("scadCompile", { source, projectId });
-}
-
 export function askAi(payload) {
   return invoke("scadAi", payload);
 }

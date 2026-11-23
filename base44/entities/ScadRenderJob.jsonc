@@ -1,0 +1,54 @@
+{
+  "name": "ScadRenderJob",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "engine": {
+      "type": "string",
+      "default": "builtin-subset"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ok",
+        "error"
+      ],
+      "enumColors": [
+        "green",
+        "red"
+      ]
+    },
+    "error_message": {
+      "type": "string"
+    },
+    "triangles": {
+      "type": "integer"
+    },
+    "source_hash": {
+      "type": "string"
+    },
+    "duration_ms": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "project_id",
+    "status"
+  ],
+  "rls": {
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}

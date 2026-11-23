@@ -1,0 +1,155 @@
+{
+  "name": "ScadProject",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Project name"
+    },
+    "slug": {
+      "type": "string",
+      "description": "URL slug used for published library pages"
+    },
+    "description": {
+      "type": "string",
+      "description": "What the model is for"
+    },
+    "source_code": {
+      "type": "string",
+      "description": "The OpenSCAD source of truth for this project"
+    },
+    "visibility": {
+      "type": "string",
+      "enum": [
+        "private",
+        "unlisted",
+        "public"
+      ],
+      "default": "private",
+      "enumColors": [
+        "gray",
+        "yellow",
+        "green"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "published"
+      ],
+      "default": "draft",
+      "enumColors": [
+        "gray",
+        "green"
+      ]
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "desk-accessories",
+        "organization",
+        "electronics",
+        "mechanical",
+        "household",
+        "tools",
+        "toys",
+        "art",
+        "storage",
+        "education",
+        "other"
+      ],
+      "default": "other"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "license": {
+      "type": "string",
+      "enum": [
+        "CC0-1.0",
+        "CC-BY-4.0",
+        "CC-BY-SA-4.0",
+        "CC-BY-NC-4.0",
+        "CC-BY-NC-SA-4.0",
+        "All-Rights-Reserved"
+      ],
+      "default": "CC-BY-4.0",
+      "description": "Remixing is blocked for All-Rights-Reserved"
+    },
+    "original_project_id": {
+      "type": "string",
+      "description": "Project this was remixed from"
+    },
+    "original_title": {
+      "type": "string"
+    },
+    "original_author": {
+      "type": "string"
+    },
+    "print_settings": {
+      "type": "string",
+      "description": "JSON object of per-project print overrides (nozzle, layer height, infill, filament, colour changes)"
+    },
+    "is_sample": {
+      "type": "boolean",
+      "default": false,
+      "description": "Seeded example community content"
+    },
+    "view_count": {
+      "type": "integer",
+      "default": 0
+    },
+    "favorite_count": {
+      "type": "integer",
+      "default": 0
+    },
+    "download_count": {
+      "type": "integer",
+      "default": 0
+    },
+    "published_at": {
+      "type": "string"
+    },
+    "thumbnail_url": {
+      "type": "string"
+    },
+    "creator_name": {
+      "type": "string",
+      "description": "Denormalised display name of the owner"
+    },
+    "creator_avatar": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.visibility": "public"
+        },
+        {
+          "data.visibility": "unlisted"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        }
+      ]
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}

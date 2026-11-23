@@ -1,0 +1,41 @@
+{
+  "name": "ScadProjectVersion",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "version_number": {
+      "type": "integer",
+      "default": 1
+    },
+    "source_code": {
+      "type": "string"
+    },
+    "parameter_snapshot": {
+      "type": "string",
+      "description": "JSON array of the parameters at save time"
+    },
+    "change_description": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "source_code"
+  ],
+  "rls": {
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}

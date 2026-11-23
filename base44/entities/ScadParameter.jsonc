@@ -1,0 +1,93 @@
+{
+  "name": "ScadParameter",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string",
+      "description": "OpenSCAD variable name, e.g. wall_thickness"
+    },
+    "label": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "number",
+        "integer",
+        "boolean",
+        "select",
+        "text",
+        "color"
+      ],
+      "default": "number",
+      "enumColors": [
+        "blue",
+        "purple",
+        "green",
+        "yellow",
+        "gray",
+        "pink"
+      ]
+    },
+    "default_value": {
+      "type": "string"
+    },
+    "min_value": {
+      "type": "number"
+    },
+    "max_value": {
+      "type": "number"
+    },
+    "unit": {
+      "type": "string"
+    },
+    "options": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "is_exposed": {
+      "type": "boolean",
+      "default": true,
+      "description": "Show this control to visitors on the model page"
+    },
+    "public": {
+      "type": "boolean",
+      "default": false,
+      "description": "Mirrors the project being published so visitors can read it"
+    },
+    "sort_order": {
+      "type": "integer",
+      "default": 0
+    }
+  },
+  "required": [
+    "project_id",
+    "name"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.public": true
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        }
+      ]
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}

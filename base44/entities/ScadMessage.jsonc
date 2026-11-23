@@ -1,0 +1,56 @@
+{
+  "name": "ScadMessage",
+  "type": "object",
+  "properties": {
+    "conversation_id": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "user",
+        "assistant"
+      ],
+      "enumColors": [
+        "blue",
+        "purple"
+      ]
+    },
+    "content": {
+      "type": "string"
+    },
+    "generated_code": {
+      "type": "string"
+    },
+    "applied": {
+      "type": "boolean",
+      "default": false
+    },
+    "meta": {
+      "type": "string",
+      "description": "JSON: assumptions, warnings, knowledge sources used"
+    }
+  },
+  "required": [
+    "conversation_id",
+    "role",
+    "content"
+  ],
+  "rls": {
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}

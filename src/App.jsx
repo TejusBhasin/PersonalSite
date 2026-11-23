@@ -1,7 +1,8 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import PageNotFound from './lib/PageNotFound';
 import ServerError from './pages/ServerError';
 import Terms from './pages/Terms';
@@ -27,6 +28,17 @@ import Invidious from './pages/Invidious';
 import Vidious from './pages/Vidious';
 import More from './pages/More';
 import AndMore from './pages/AndMore';
+import ScadLanding from './pages/scadman/ScadLanding';
+import ScadSignIn from './pages/scadman/ScadSignIn';
+import ScadLayout from './components/scadman/ScadLayout';
+import ScadHome from './pages/scadman/ScadHome';
+import ScadCreate from './pages/scadman/ScadCreate';
+import ScadProjects from './pages/scadman/ScadProjects';
+import ScadEditor from './pages/scadman/ScadEditor';
+import ScadLibrary from './pages/scadman/ScadLibrary';
+import ScadModel from './pages/scadman/ScadModel';
+import ScadFavorites from './pages/scadman/ScadFavorites';
+import ScadSettings from './pages/scadman/ScadSettings';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -74,6 +86,22 @@ const AuthenticatedApp = () => {
       <Route path="/more" element={<More />} />
       <Route path="/andmore" element={<AndMore />} />
       <Route path="/games/:slug" element={<PlayGame />} />
+      <Route path="/scadman" element={<ScadLanding />} />
+      <Route path="/scadman/login" element={<ScadSignIn />} />
+      <Route element={<ScadLayout />}>
+        <Route path="/scadman/library" element={<ScadLibrary />} />
+        <Route path="/scadman/library/:slug" element={<ScadModel />} />
+      </Route>
+      <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/scadman/login" replace />} />}>
+        <Route element={<ScadLayout />}>
+          <Route path="/scadman/home" element={<ScadHome />} />
+          <Route path="/scadman/create" element={<ScadCreate />} />
+          <Route path="/scadman/projects" element={<ScadProjects />} />
+          <Route path="/scadman/editor/:projectId" element={<ScadEditor />} />
+          <Route path="/scadman/favorites" element={<ScadFavorites />} />
+          <Route path="/scadman/settings" element={<ScadSettings />} />
+        </Route>
+      </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </VisitTracker>

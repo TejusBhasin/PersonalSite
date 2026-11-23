@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Check, CornerDownLeft, RotateCcw, Sparkles, X } from "lucide-react";
+import { Check, CornerDownLeft, RotateCcw, Sparkles, Undo2 } from "lucide-react";
+import ScadAiProgress from "@/components/scadman/ScadAiProgress";
 
 const SUGGESTIONS = [
   "Desk organizer with three compartments and a phone slot",
@@ -10,13 +11,14 @@ const SUGGESTIONS = [
 
 export default function ScadAiPanel({
   messages,
-  pending,
+  applied,
   busy,
+  stage,
+  elapsed,
   error,
   knowledge,
   onSend,
-  onApply,
-  onReject,
+  onRevert,
   onRetry,
 }) {
   const [text, setText] = useState("");
@@ -25,7 +27,7 @@ export default function ScadAiPanel({
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [messages.length, pending, busy]);
+  }, [messages.length, applied, busy]);
 
   const submit = () => {
     const value = text.trim();
@@ -47,11 +49,12 @@ export default function ScadAiPanel({
       </div>
 
       <div ref={scrollRef} className="min-h-0 flex-1 space-y-3 overflow-y-auto px-3 py-3">
-        {messages.length === 0 && !pending && (
+        {messages.length === 0 && !applied && (
           <div>
             <p className="text-[11.5px] leading-relaxed text-[color:var(--scad-muted)]">
-              Describe the part you need. You get complete OpenSCAD source, the parameters behind it,
-              and the assumptions made. Nothing is applied until you accept it.
+              Describe the part you need and the assistant writes it straight into the editor, with
+              the parameters behind it and the assumptions it made. It works on any source,
+              including code you wrote by hand.
             </p>
             <div className="mt-3 space-y-1.5">
               {SUGGESTIONS.map((suggestion) => (
@@ -90,14 +93,7 @@ export default function ScadAiPanel({
           </div>
         ))}
 
-        {busy && (
-          <div className="flex items-center gap-2 px-1">
-            <div className="h-3 w-3 animate-spin rounded-full border border-[#2e3846] border-t-[#e9b14c]" />
-            <span className="text-[10.5px] uppercase tracking-[0.12em] text-[color:var(--scad-dim)]">
-              generating
-            </span>
-          </div>
-        )}
+        {busy && <ScadAiProgress stage={stage} elapsed={elapsed} />}
 
         {error && (
           <div
@@ -117,22 +113,22 @@ export default function ScadAiPanel({
           </div>
         )}
 
-        {pending && (
-          <div className="scad-panel p-2.5" style={{ borderColor: "var(--scad-accent)" }}>
-            <p className="text-[9.5px] font-bold uppercase tracking-[0.14em]" style={{ color: "var(--scad-accent)" }}>
-              proposed change
-            </p>
-            <p className="mt-1.5 whitespace-pre-wrap text-[11.5px] leading-relaxed text-[color:var(--scad-text)]">
-              {pending.reply}
-            </p>
+        {applied && (
+          <div className="scad-panel p-2.5" style={{ borderColor: "var(--scad-line-2)" }}>
+            <div className="flex items-center gap-1.5">
+              <Check className="h-3 w-3" style={{ color: "var(--scad-ok)" }} />
+              <p className="text-[9.5px] font-bold uppercase tracking-[0.14em]" style={{ color: "var(--scad-ok)" }}>
+                {applied.unchanged ? "source already matches" : "written into the editor"}
+              </p>
+            </div>
 
-            {pending.assumptions?.length > 0 && (
+            {applied.assumptions?.length > 0 && (
               <div className="mt-2">
                 <p className="text-[9.5px] font-bold uppercase tracking-[0.12em] text-[color:var(--scad-dim)]">
                   assumptions
                 </p>
                 <ul className="mt-1 space-y-1">
-                  {pending.assumptions.map((line) => (
+                  {applied.assumptions.map((line) => (
                     <li key={line} className="text-[10.5px] leading-relaxed text-[color:var(--scad-muted)]">
                       · {line}
                     </li>
@@ -141,13 +137,13 @@ export default function ScadAiPanel({
               </div>
             )}
 
-            {pending.warnings?.length > 0 && (
+            {applied.warnings?.length > 0 && (
               <div className="mt-2">
                 <p className="text-[9.5px] font-bold uppercase tracking-[0.12em]" style={{ color: "#ecc178" }}>
                   warnings
                 </p>
                 <ul className="mt-1 space-y-1">
-                  {pending.warnings.map((line) => (
+                  {applied.warnings.map((line) => (
                     <li key={line} className="text-[10.5px] leading-relaxed" style={{ color: "#ecc178" }}>
                       · {line}
                     </li>
@@ -157,16 +153,15 @@ export default function ScadAiPanel({
             )}
 
             <div className="mt-2.5 flex items-center gap-1.5">
-              <button type="button" onClick={onApply} className="scad-btn scad-btn-primary scad-btn-sm flex-1">
-                <Check className="h-3.5 w-3.5" />
-                Apply
-              </button>
-              <button type="button" onClick={onReject} className="scad-btn scad-btn-sm">
-                <X className="h-3.5 w-3.5" />
-                Reject
-              </button>
-              <button type="button" onClick={onRetry} className="scad-btn scad-btn-sm" title="Generate again">
+              {!applied.unchanged && (
+                <button type="button" onClick={onRevert} className="scad-btn scad-btn-sm flex-1">
+                  <Undo2 className="h-3.5 w-3.5" />
+                  Revert
+                </button>
+              )}
+              <button type="button" onClick={onRetry} className="scad-btn scad-btn-sm" title="Run the last prompt again">
                 <RotateCcw className="h-3.5 w-3.5" />
+                Retry
               </button>
             </div>
           </div>

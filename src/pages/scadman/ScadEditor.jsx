@@ -59,7 +59,10 @@ export default function ScadEditor() {
 
   const [aiBusy, setAiBusy] = useState(false);
   const [aiError, setAiError] = useState("");
-  const [pending, setPending] = useState(null);
+  const [aiStage, setAiStage] = useState(-1);
+  const [aiElapsed, setAiElapsed] = useState(0);
+  const [applied, setApplied] = useState(null);
+  const [streaming, setStreaming] = useState(false);
   const [lastPrompt, setLastPrompt] = useState("");
   const [compile, setCompile] = useState({ loading: false, result: null, error: "" });
   const [saveState, setSaveState] = useState("saved");
@@ -227,11 +230,11 @@ export default function ScadEditor() {
   );
 
   useEffect(() => {
-    if (!dirty || !project) return;
+    if (!dirty || !project || streaming) return;
     if (profile && profile.autosave === false) return;
     const timer = setTimeout(() => persist(code, "Autosave"), 2000);
     return () => clearTimeout(timer);
-  }, [code, dirty, project, profile, persist]);
+  }, [code, dirty, project, profile, persist, streaming]);
 
   useEffect(() => {
     const handler = (event) => {
@@ -248,8 +251,14 @@ export default function ScadEditor() {
       if (!text.trim() || aiBusy) return;
       setAiBusy(true);
       setLastPrompt(text);
-      setPending(null);
+      setApplied(null);
       setAiError("");
+      setAiStage(0);
+      setAiElapsed(0);
+      const startedAt = Date.now();
+      const clock = window.setInterval(() => setAiElapsed((Date.now() - startedAt) / 1000), 200);
+      const stage1 = window.setTimeout(() => setAiStage(1), 700);
+      const stage2 = window.setTimeout(() => setAiStage(2), 2200);
       const localId = `local-${Date.now()}`;
       setMessages((list) => [...list, { id: localId, role: "user", content: text }]);
       try {
@@ -274,7 +283,9 @@ export default function ScadEditor() {
           diagnostics: compile.result?.diagnostics || [],
           history: messages.slice(-8).map((m) => ({ role: m.role, content: m.content })),
         });
-        setPending({ ...data, prompt: text });
+        window.clearTimeout(stage1);
+        window.clearTimeout(stage2);
+        setAiStage(2);
         setKnowledge(data.knowledge);
         setMessages((list) => [
           ...list,
@@ -299,13 +310,59 @@ export default function ScadEditor() {
             }),
           }).catch(() => null);
         }
+
+        const previous = code;
+        const next = String(data.code || "");
+        const summary = {
+          reply: data.reply,
+          title: data.title,
+          assumptions: data.assumptions || [],
+          warnings: data.warnings || [],
+          previousCode: previous,
+          unchanged: !next || next === previous,
+        };
+
+        if (summary.unchanged) {
+          setApplied(summary);
+          return;
+        }
+
+        // Write the new source into the editor a few characters at a time so the change
+        // lands where you can watch it happen, then save once at the end.
+        setStreaming(true);
+        const total = next.length;
+        const chunk = Math.max(6, Math.ceil(total / 70));
+        await new Promise((resolve) => {
+          let index = 0;
+          const writer = window.setInterval(() => {
+            index = Math.min(total, index + chunk);
+            setCode(next.slice(0, index));
+            if (index >= total) {
+              window.clearInterval(writer);
+              resolve();
+            }
+          }, 22);
+        });
+        setStreaming(false);
+        setCode(next);
+        setApplied(summary);
+        setAiStage(3);
+        await persist(next, `AI: ${data.title || text}`.slice(0, 120), {
+          syncParams: true,
+          hints: data.parameters || [],
+        });
       } catch (e) {
         setAiError(e.message || "The assistant could not respond.");
       } finally {
+        window.clearInterval(clock);
+        window.clearTimeout(stage1);
+        window.clearTimeout(stage2);
+        setStreaming(false);
+        setAiStage(-1);
         setAiBusy(false);
       }
     },
-    [aiBusy, code, params, compile.result, messages, conversationId, projectId, notify]
+    [aiBusy, code, params, compile.result, messages, conversationId, projectId, persist]
   );
 
   useEffect(() => {
@@ -317,16 +374,13 @@ export default function ScadEditor() {
     }
   }, [location, state, runAi, navigate]);
 
-  const applyPending = async () => {
-    if (!pending || !project) return;
-    const nextCode = pending.code;
-    setCode(nextCode);
-    setPending(null);
-    await persist(nextCode, `AI: ${pending.title || pending.prompt}`.slice(0, 120), {
-      syncParams: true,
-      hints: pending.parameters || [],
-    });
-    notify("Applied. Parameters were re-detected from the new source.");
+  const revertChange = async () => {
+    if (!applied || applied.unchanged) return;
+    const back = applied.previousCode || "";
+    setCode(back);
+    setApplied(null);
+    await persist(back, "Reverted the assistant change");
+    notify("Reverted to the previous source.");
   };
 
   const changeParam = (param, value) => {
@@ -421,16 +475,28 @@ export default function ScadEditor() {
   const errors = diagnostics.filter((d) => d.severity === "error");
   const warnings = diagnostics.filter((d) => d.severity === "warning");
 
+  const fixWithAi = () => {
+    const lines = errors
+      .slice(0, 6)
+      .map((d) => `- ${d.line ? `line ${d.line}: ` : ""}${d.message}`)
+      .join("\n");
+    if (!wide) setPane("ai");
+    runAi(
+      `Fix the OpenSCAD compile errors in this model and return the complete corrected source, keeping the design intent.\n\nCompiler output:\n${lines}`
+    );
+  };
+
   const aiPanel = (
     <ScadAiPanel
       messages={messages}
-      pending={pending}
+      applied={applied}
       busy={aiBusy}
+      stage={aiStage}
+      elapsed={aiElapsed}
       error={aiError}
       knowledge={knowledge}
       onSend={runAi}
-      onApply={applyPending}
-      onReject={() => setPending(null)}
+      onRevert={revertChange}
       onRetry={() => runAi(lastPrompt)}
     />
   );
@@ -666,6 +732,8 @@ export default function ScadEditor() {
               stats={compile.result?.stats}
               engineLabel={compile.result?.engineLabel}
               loading={compile.loading}
+              onFix={fixWithAi}
+              fixing={aiBusy}
             />
           </div>
 
@@ -698,6 +766,8 @@ export default function ScadEditor() {
               stats={compile.result?.stats}
               engineLabel={compile.result?.engineLabel}
               loading={compile.loading}
+              onFix={fixWithAi}
+              fixing={aiBusy}
             />
           <nav
             className="grid grid-cols-4 border-t"
@@ -727,7 +797,7 @@ export default function ScadEditor() {
   );
 }
 
-function DiagnosticsBar({ errors, warnings, error, stats, engineLabel, loading }) {
+function DiagnosticsBar({ errors, warnings, error, stats, engineLabel, loading, onFix, fixing }) {
   const [open, setOpen] = useState(false);
   const problem = errors[0] || null;
 
@@ -760,6 +830,18 @@ function DiagnosticsBar({ errors, warnings, error, stats, engineLabel, loading }
                 ? "Compiling with OpenSCAD. The first run downloads the compiler once."
                 : "Compiled by the real OpenSCAD kernel. Warnings appear here.")}
         </span>
+        {errors.length > 0 && onFix && (
+          <button
+            type="button"
+            onClick={onFix}
+            disabled={fixing}
+            className="scad-btn scad-btn-sm"
+            title="Send these errors to the assistant and apply its fix"
+          >
+            <Wand2 className="h-3.5 w-3.5" />
+            {fixing ? "Fixing…" : "Fix with AI"}
+          </button>
+        )}
       </div>
       {open && warnings.length > 0 && (
         <ul className="mt-1.5 space-y-1">

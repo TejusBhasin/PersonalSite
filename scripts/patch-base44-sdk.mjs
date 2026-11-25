@@ -36,6 +36,23 @@ const STUBS = [
     ].join('\n'),
   },
   {
+    // Loaded by dist/visual-edit-plugin.js. Same failure mode: the build stops with
+    // ERR_MODULE_NOT_FOUND on this import before any app code is compiled.
+    pkg: '@base44/vite-plugin',
+    relative: 'dist/cjs-interop.js',
+    contents: [
+      '// Auto-generated fallback: the installed package omitted this file.',
+      'export function cjsDefault(mod, name) {',
+      '  const fn = typeof mod === "function" ? mod : mod && mod.default;',
+      '  if (typeof fn === "function") return fn;',
+      '  return () => {',
+      '    throw new TypeError(`${name} has no callable default export`);',
+      '  };',
+      '}',
+      '',
+    ].join('\n'),
+  },
+  {
     // @base44/vite-plugin/dist/index.js imports this module at load time. When the
     // file is missing the build dies with ERR_MODULE_NOT_FOUND before Vite starts.
     pkg: '@base44/vite-plugin',

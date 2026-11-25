@@ -40,6 +40,7 @@ import ScadModel from './pages/scadman/ScadModel';
 import ScadSlice from './pages/scadman/ScadSlice';
 import ScadFavorites from './pages/scadman/ScadFavorites';
 import ScadSettings from './pages/scadman/ScadSettings';
+import Mp3nowApp from './pages/mp3now/Mp3nowApp';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -87,6 +88,7 @@ const AuthenticatedApp = () => {
       <Route path="/more" element={<More />} />
       <Route path="/andmore" element={<AndMore />} />
       <Route path="/games/:slug" element={<PlayGame />} />
+      <Route path="/mp3now" element={<Mp3nowApp />} />
       <Route path="/scadman" element={<ScadLanding />} />
       <Route path="/scadman/login" element={<ScadSignIn />} />
       <Route element={<ScadLayout />}>

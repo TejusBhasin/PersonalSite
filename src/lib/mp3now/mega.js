@@ -21,13 +21,26 @@ async function loadRoot() {
   return rootPromise;
 }
 
+// Files inside a shared folder expose an array download id [folderHandle, nodeHandle];
+// the node handle is the second entry, matching what the sync stored.
+function nodeKey(file) {
+  const id = file.downloadId;
+  if (Array.isArray(id)) return id[1] ? String(id[1]) : id[0] ? String(id[0]) : "";
+  if (typeof id === "string") return id;
+  return file.nodeId ? String(file.nodeId) : "";
+}
+
 async function buildIndex(root) {
   const nodes = new Map();
   const walk = async (dir) => {
     if (!dir.children) await dir.loadAttributes();
     for (const child of dir.children || []) {
-      if (child.directory) await walk(child);
-      else if (child.downloadId) nodes.set(child.downloadId, child);
+      if (child.directory) {
+        await walk(child);
+      } else {
+        const key = nodeKey(child);
+        if (key) nodes.set(key, child);
+      }
     }
   };
   await walk(root);

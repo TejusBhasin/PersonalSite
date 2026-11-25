@@ -6,8 +6,22 @@ import { requireAdmin, fetchAllPages, chunk } from "../../shared/mp3nowAuth.ts";
 const AUDIO = /\.(mp3|m4a|m4b|aac|flac|wav|ogg|oga|opus)$/i;
 const MAX_FILES = 12000;
 
+// Files inside a shared folder carry an array download id [folderHandle, nodeHandle];
+// the node handle is the second entry and is what we store.
+function nodeKey(file) {
+  const id = file.downloadId;
+  if (Array.isArray(id)) return id[1] ? String(id[1]) : id[0] ? String(id[0]) : "";
+  if (typeof id === "string") return id;
+  return file.nodeId ? String(file.nodeId) : "";
+}
+
 function parseFileName(fileName) {
-  const base = String(fileName || "").replace(AUDIO, "").replace(/_/g, " ").trim();
+  // Leading track numbers ("03 - Title", "03. Title") are not artists.
+  const base = String(fileName || "")
+    .replace(AUDIO, "")
+    .replace(/_/g, " ")
+    .replace(/^\s*\d{1,3}\s*[.\-–—)\]]\s+/, "")
+    .trim();
   const parts = base.split(/\s+[-–—]\s+/);
   if (parts.length >= 2) {
     return { artist: parts[0].trim() || "Unknown Artist", title: parts.slice(1).join(" - ").trim() };
@@ -24,7 +38,7 @@ async function walk(node, path, out) {
       await walk(child, [...path, child.name || "Untitled folder"], out);
     } else if (AUDIO.test(child.name || "")) {
       out.push({
-        nodeId: child.downloadId,
+        nodeId: nodeKey(child),
         fileName: child.name,
         size: child.size || 0,
         path,
@@ -121,9 +135,11 @@ export default async function (req) {
     // Rebuild the playlist rows for every synced folder.
     const savedPlaylists = [];
     for (const plan of playlistPlans) {
-      const ids = plan.trackIds.concat(
-        plan.group.files.map((f) => createdByNode.get(f.nodeId)?.id).filter(Boolean)
-      );
+      const ids = [
+        ...new Set(
+          plan.trackIds.concat(plan.group.files.map((f) => createdByNode.get(f.nodeId)?.id).filter(Boolean))
+        ),
+      ];
       if (!ids.length) continue;
       let playlist = plan.playlist;
       const patch = { trackCount: ids.length };

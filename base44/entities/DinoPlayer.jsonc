@@ -10,9 +10,21 @@
       "type": "string",
       "description": "Lowercased username, used for lookups"
     },
+    "salt": {
+      "type": "string",
+      "description": "Random salt mixed into the password before hashing"
+    },
+    "password_hash": {
+      "type": "string",
+      "description": "SHA-256 hex of salt + password; the password itself is never stored"
+    },
+    "session_token": {
+      "type": "string",
+      "description": "Token handed to the browser at sign-in, used to submit scores"
+    },
     "password": {
       "type": "string",
-      "description": "Player password, stored as typed (no hashing) as requested"
+      "description": "Legacy plaintext password from before hashing; cleared on the next sign-in"
     },
     "best_score": {
       "type": "integer",
@@ -22,8 +34,7 @@
   },
   "required": [
     "username",
-    "handle",
-    "password"
+    "handle"
   ],
   "rls": {
     "read": {

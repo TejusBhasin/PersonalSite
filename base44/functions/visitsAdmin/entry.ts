@@ -1,17 +1,12 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.54';
 import { secrets } from 'base44:runtime';
+import { clearAttempts, clientIp, isRateLimited, matches, noteAttempt } from '../../shared/guard.ts';
 
-// Constant-time-ish comparison so the access code can't be guessed by timing.
-function matches(input, expected) {
-  if (typeof input !== 'string' || typeof expected !== 'string') return false;
-  if (input.length !== expected.length) return false;
-  let diff = 0;
-  for (let i = 0; i < expected.length; i += 1) {
-    diff |= input.charCodeAt(i) ^ expected.charCodeAt(i);
-  }
-  return diff === 0;
-}
+const MAX_ATTEMPTS = 8;
+const WINDOW_MS = 15 * 60 * 1000;
 
+// Visitor logs and ban controls behind one access code. The code is compared in constant
+// time and each caller address is throttled, so the log cannot be brute-forced open.
 export default async function(req) {
   try {
     const body = await req.json().catch(() => ({}));
@@ -20,11 +15,18 @@ export default async function(req) {
     if (!expected) {
       return Response.json({ error: 'Access code is not configured' }, { status: 500 });
     }
-    if (!matches(code.trim(), expected)) {
-      return Response.json({ error: 'Incorrect password' }, { status: 401 });
-    }
 
     const base44 = createClientFromRequest(req);
+    const throttleKey = `visits:${clientIp(req)}`;
+    if (await isRateLimited(base44, throttleKey, { max: MAX_ATTEMPTS, windowMs: WINDOW_MS })) {
+      return Response.json({ error: 'Too many attempts. Try again later.' }, { status: 429 });
+    }
+    if (!matches(code.trim(), expected)) {
+      await noteAttempt(base44, throttleKey, { windowMs: WINDOW_MS });
+      return Response.json({ error: 'Incorrect password' }, { status: 401 });
+    }
+    await clearAttempts(base44, throttleKey);
+
     const action = typeof body?.action === 'string' ? body.action : 'list';
 
     if (action === 'list') {

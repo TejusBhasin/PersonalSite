@@ -1,18 +1,13 @@
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.54';
 import { secrets } from 'base44:runtime';
+import { clientIp, isRateLimited, noteAttempt, secretMatches } from '../../shared/guard.ts';
 
-// Compares without leaking length or early-exit timing, so the passcode cannot be
-// guessed by measuring how long a rejection takes.
-function matches(input: string, expected: string): boolean {
-  if (input.length !== expected.length) return false;
-  let diff = 0;
-  for (let i = 0; i < expected.length; i += 1) {
-    diff |= input.charCodeAt(i) ^ expected.charCodeAt(i);
-  }
-  return diff === 0;
-}
+const MAX_ATTEMPTS = 8;
+const WINDOW_MS = 15 * 60 * 1000;
 
 // Checks the passcode that unlocks MP3now against the TPASS secret. The secret never
-// leaves the server; the client only ever learns whether the code was right.
+// leaves the server, the comparison goes through fixed-length digests (so neither the
+// value nor its length leaks), and each caller address is throttled.
 export default async function (req: Request): Promise<Response> {
   try {
     const body = await req.json().catch(() => ({}));
@@ -26,7 +21,17 @@ export default async function (req: Request): Promise<Response> {
       return Response.json({ error: 'The passcode is not configured' }, { status: 500 });
     }
 
-    return Response.json({ ok: matches(code, expected) });
+    const base44 = createClientFromRequest(req);
+    const throttleKey = `mp3now:${clientIp(req)}`;
+    if (await isRateLimited(base44, throttleKey, { max: MAX_ATTEMPTS, windowMs: WINDOW_MS })) {
+      return Response.json({ error: 'Too many attempts. Try again later.' }, { status: 429 });
+    }
+
+    const ok = await secretMatches(code, expected);
+    if (!ok) {
+      await noteAttempt(base44, throttleKey, { windowMs: WINDOW_MS });
+    }
+    return Response.json({ ok });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }

@@ -1,0 +1,44 @@
+{
+  "name": "AuthAttempt",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "Throttle key, e.g. 'mp3now:203.0.113.9'"
+    },
+    "count": {
+      "type": "integer",
+      "default": 0,
+      "description": "Failed attempts inside the current window"
+    },
+    "window_start": {
+      "type": "string",
+      "description": "ISO timestamp the current window began"
+    }
+  },
+  "required": [
+    "key"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

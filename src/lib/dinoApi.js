@@ -20,7 +20,8 @@ export function loadSession() {
     const raw = localStorage.getItem(SESSION_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    if (!parsed?.username || !parsed?.password) return null;
+    // Only the username and the server-issued token are kept: never the password.
+    if (!parsed?.username || !parsed?.token) return null;
     return parsed;
   } catch {
     return null;

@@ -29,15 +29,15 @@ export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
 
-    // Direct invocations from the app must come from an admin.
-    // Scheduled workflow runs have no user context and are allowed.
-    try {
-      const user = await base44.auth.me();
-      if (user && user.role !== "admin") {
-        return Response.json({ error: "Forbidden" }, { status: 403 });
-      }
-    } catch {
-      // no user context (scheduled run)
+    // Only an admin may run this. The weekly workflow calls the function as its creator,
+    // an app admin, while a caller with no valid session is rejected instead of being
+    // mistaken for a scheduled run.
+    const user = await base44.auth.me().catch((e) => (e.status === 401 ? null : Promise.reject(e)));
+    if (!user) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (user.role !== "admin") {
+      return Response.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const repos = await ghJson(`/users/${GH_USER}/repos?per_page=100&sort=pushed`);

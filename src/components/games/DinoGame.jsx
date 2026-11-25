@@ -31,7 +31,7 @@ export default function DinoGame() {
   const handleAuth = (data, creds) => {
     const next = {
       username: data.player?.username || creds.username,
-      password: creds.password,
+      token: data.token,
       best: data.player?.best_score || 0,
     };
     setPlayer(next);
@@ -64,7 +64,7 @@ export default function DinoGame() {
         const data = await dinoCall({
           action: "submit",
           username: player.username,
-          password: player.password,
+          token: player.token,
           score,
         });
         const next = { ...player, best: data.best_score || 0 };

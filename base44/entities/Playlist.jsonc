@@ -1,0 +1,57 @@
+{
+  "name": "Playlist",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "megaFolderPath": {
+      "type": "string",
+      "description": "Folder path inside the MEGA root, e.g. 'Chill / Instrumental'"
+    },
+    "isMegaSynced": {
+      "type": "boolean",
+      "default": true
+    },
+    "isAiGenerated": {
+      "type": "boolean",
+      "default": false
+    },
+    "coverArtDataUrl": {
+      "type": "string",
+      "description": "Auto-filled from the first track that has cover art"
+    },
+    "trackCount": {
+      "type": "integer",
+      "default": 0
+    },
+    "description": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

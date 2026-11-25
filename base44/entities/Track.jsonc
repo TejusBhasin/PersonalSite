@@ -1,0 +1,69 @@
+{
+  "name": "Track",
+  "type": "object",
+  "properties": {
+    "megaNodeId": {
+      "type": "string",
+      "description": "MEGA node handle for the file, unique per track"
+    },
+    "title": {
+      "type": "string"
+    },
+    "artist": {
+      "type": "string",
+      "default": "Unknown Artist"
+    },
+    "album": {
+      "type": "string",
+      "default": "Unknown Album"
+    },
+    "genre": {
+      "type": "string"
+    },
+    "duration": {
+      "type": "number",
+      "description": "Length in seconds once the ID3 tags have been read"
+    },
+    "coverArtDataUrl": {
+      "type": "string",
+      "description": "200x200 JPEG data URL thumbnail"
+    },
+    "metadataLoaded": {
+      "type": "boolean",
+      "default": false
+    },
+    "fileSize": {
+      "type": "number"
+    },
+    "folderPath": {
+      "type": "string",
+      "description": "Playlist folder path the file was found in during the last sync"
+    }
+  },
+  "required": [
+    "megaNodeId",
+    "title"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

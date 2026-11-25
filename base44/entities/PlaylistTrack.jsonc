@@ -1,0 +1,42 @@
+{
+  "name": "PlaylistTrack",
+  "type": "object",
+  "properties": {
+    "playlistId": {
+      "type": "string"
+    },
+    "trackId": {
+      "type": "string"
+    },
+    "position": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "playlistId",
+    "trackId"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

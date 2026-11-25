@@ -59,12 +59,7 @@ async function attemptRow(base44: any, key: string) {
   return (Array.isArray(rows) ? rows : rows?.items || [])[0] || null;
 }
 
-// True once the key has used up its attempts inside the current window.
-export async function isRateLimited(
-  base44: any,
-  key: string,
-  { max = DEFAULT_MAX, windowMs = DEFAULT_WINDOW }: { max?: number; windowMs?: number } = {},
-): Promise<boolean> {
+async function overLimit(base44: any, key: string, max: number, windowMs: number): Promise<boolean> {
   const row = await attemptRow(base44, key);
   if (!row) return false;
   const started = Date.parse(row.window_start || '');
@@ -72,11 +67,7 @@ export async function isRateLimited(
   return (row.count || 0) >= max;
 }
 
-export async function noteAttempt(
-  base44: any,
-  key: string,
-  { windowMs = DEFAULT_WINDOW }: { windowMs?: number } = {},
-): Promise<void> {
+async function bump(base44: any, key: string, windowMs: number): Promise<void> {
   const now = new Date().toISOString();
   const row = await attemptRow(base44, key);
   if (!row) {
@@ -89,6 +80,33 @@ export async function noteAttempt(
     count: stale ? 1 : (row.count || 0) + 1,
     window_start: stale ? now : row.window_start,
   });
+}
+
+// True once the key has used up its attempts inside the current window. The caller's
+// address can rotate (proxies, mobile networks), so a scope may also carry a cap across
+// every caller: guessing stays bounded even when the per-address key keeps changing.
+export async function isRateLimited(
+  base44: any,
+  key: string,
+  {
+    max = DEFAULT_MAX,
+    windowMs = DEFAULT_WINDOW,
+    globalMax = 0,
+    scope = '',
+  }: { max?: number; windowMs?: number; globalMax?: number; scope?: string } = {},
+): Promise<boolean> {
+  if (await overLimit(base44, key, max, windowMs)) return true;
+  if (globalMax > 0 && scope) return overLimit(base44, `global:${scope}`, globalMax, windowMs);
+  return false;
+}
+
+export async function noteAttempt(
+  base44: any,
+  key: string,
+  { windowMs = DEFAULT_WINDOW, scope = '' }: { windowMs?: number; scope?: string } = {},
+): Promise<void> {
+  await bump(base44, key, windowMs);
+  if (scope) await bump(base44, `global:${scope}`, windowMs);
 }
 
 export async function clearAttempts(base44: any, key: string): Promise<void> {

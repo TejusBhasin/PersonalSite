@@ -23,13 +23,20 @@ export default async function (req: Request): Promise<Response> {
 
     const base44 = createClientFromRequest(req);
     const throttleKey = `mp3now:${clientIp(req)}`;
-    if (await isRateLimited(base44, throttleKey, { max: MAX_ATTEMPTS, windowMs: WINDOW_MS })) {
+    if (
+      await isRateLimited(base44, throttleKey, {
+        max: MAX_ATTEMPTS,
+        windowMs: WINDOW_MS,
+        globalMax: 40,
+        scope: 'mp3now',
+      })
+    ) {
       return Response.json({ error: 'Too many attempts. Try again later.' }, { status: 429 });
     }
 
     const ok = await secretMatches(code, expected);
     if (!ok) {
-      await noteAttempt(base44, throttleKey, { windowMs: WINDOW_MS });
+      await noteAttempt(base44, throttleKey, { windowMs: WINDOW_MS, scope: 'mp3now' });
     }
     return Response.json({ ok });
   } catch (error) {

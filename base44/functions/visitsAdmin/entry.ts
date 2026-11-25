@@ -18,11 +18,18 @@ export default async function(req) {
 
     const base44 = createClientFromRequest(req);
     const throttleKey = `visits:${clientIp(req)}`;
-    if (await isRateLimited(base44, throttleKey, { max: MAX_ATTEMPTS, windowMs: WINDOW_MS })) {
+    if (
+      await isRateLimited(base44, throttleKey, {
+        max: MAX_ATTEMPTS,
+        windowMs: WINDOW_MS,
+        globalMax: 40,
+        scope: 'visits',
+      })
+    ) {
       return Response.json({ error: 'Too many attempts. Try again later.' }, { status: 429 });
     }
     if (!matches(code.trim(), expected)) {
-      await noteAttempt(base44, throttleKey, { windowMs: WINDOW_MS });
+      await noteAttempt(base44, throttleKey, { windowMs: WINDOW_MS, scope: 'visits' });
       return Response.json({ error: 'Incorrect password' }, { status: 401 });
     }
     await clearAttempts(base44, throttleKey);

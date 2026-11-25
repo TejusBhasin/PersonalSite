@@ -22,7 +22,14 @@ export default async function(req) {
 
     const base44 = createClientFromRequest(req);
     const throttleKey = `other:${clientIp(req)}`;
-    if (await isRateLimited(base44, throttleKey, { max: MAX_ATTEMPTS, windowMs: WINDOW_MS })) {
+    if (
+      await isRateLimited(base44, throttleKey, {
+        max: MAX_ATTEMPTS,
+        windowMs: WINDOW_MS,
+        globalMax: 40,
+        scope: 'other',
+      })
+    ) {
       return Response.json({ ok: false, error: "Too many attempts. Try again later." }, { status: 429 });
     }
 
@@ -36,7 +43,7 @@ export default async function(req) {
     const hash = await sha256Hex(`${record.salt || ""}${code}`);
     const ok = matches(hash, record.hash);
     if (!ok) {
-      await noteAttempt(base44, throttleKey, { windowMs: WINDOW_MS });
+      await noteAttempt(base44, throttleKey, { windowMs: WINDOW_MS, scope: 'other' });
     }
     return Response.json({ ok });
   } catch (error) {

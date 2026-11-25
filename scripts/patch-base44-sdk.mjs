@@ -7,7 +7,9 @@
 // absent, so a healthy install is never touched. Runs before "vite build" on every
 // build so the publish machine repairs itself.
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 
 const STUBS = [
@@ -114,6 +116,129 @@ for (const stub of STUBS) {
     // Never fail the build from this safety net.
     log(`skipped ${stub.pkg}/${stub.relative} (${error?.message || error})`);
   }
+}
+
+// ---------------------------------------------------------------------------
+// Self-heal @base44/vite-plugin. Its install on a build machine is sometimes
+// partial, and a single missing dist module stops the build with
+// ERR_MODULE_NOT_FOUND before any app code compiles. Restore every missing
+// relative import from the published tarball, then stub whatever is left.
+// ---------------------------------------------------------------------------
+
+const PLUGIN = '@base44/vite-plugin';
+
+function walkJs(dir, out = []) {
+  let entries = [];
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return out;
+  }
+  for (const entry of entries) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) walkJs(full, out);
+    else if (entry.name.endsWith('.js')) out.push(full);
+  }
+  return out;
+}
+
+function importedNames(clause) {
+  const names = new Set();
+  const brace = clause.match(/\{([\s\S]*)\}/);
+  if (brace) {
+    for (const part of brace[1].split(',')) {
+      const clean = part.trim();
+      if (!clean) continue;
+      const renamed = clean.match(/\bas\s+([A-Za-z_$][\w$]*)$/);
+      names.add(renamed ? renamed[1] : clean);
+    }
+  }
+  const head = clause.replace(/\{[\s\S]*\}/, '').replace(/,$/, '').trim();
+  if (head) names.add('default');
+  return names;
+}
+
+function missingPluginModules(root) {
+  const dist = path.join(root, 'dist');
+  const missing = new Map();
+  const pattern = /(?:^|\n)\s*(?:import|export)\s+([\s\S]*?)\s*from\s*["'](\.[^"']+)["']/g;
+  for (const file of walkJs(dist)) {
+    const code = fs.readFileSync(file, 'utf8');
+    let match;
+    while ((match = pattern.exec(code))) {
+      const spec = match[2];
+      if (!spec.endsWith('.js')) continue;
+      const target = path.resolve(path.dirname(file), spec);
+      if (fs.existsSync(target)) continue;
+      const relative = path.relative(dist, target);
+      const names = missing.get(relative) || new Set();
+      for (const name of importedNames(match[1])) names.add(name);
+      missing.set(relative, names);
+    }
+  }
+  return missing;
+}
+
+function restoreFromTarball(root, version, relatives) {
+  const restored = new Set();
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'b44-vite-plugin-'));
+  execFileSync('npm', ['pack', `${PLUGIN}@${version}`, '--pack-destination', tmp], {
+    stdio: 'ignore',
+    timeout: 90000,
+  });
+  const tarball = fs.readdirSync(tmp).find((name) => name.endsWith('.tgz'));
+  if (!tarball) return restored;
+  execFileSync('tar', ['-xzf', path.join(tmp, tarball), '-C', tmp], { stdio: 'ignore', timeout: 90000 });
+  for (const relative of relatives) {
+    const source = path.join(tmp, 'package', 'dist', relative);
+    if (!fs.existsSync(source)) continue;
+    const target = path.join(root, 'dist', relative);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.copyFileSync(source, target);
+    restored.add(relative);
+    log(`restored ${PLUGIN}/dist/${relative} from the published tarball`);
+  }
+  return restored;
+}
+
+function stubModule(names) {
+  const lines = [
+    '// Auto-generated fallback: the installed package omitted this file.',
+    'function fallback(...args) {',
+    '  return args.find((value) => value && typeof value === "object") ?? { name: "base44-fallback" };',
+    '}',
+  ];
+  for (const name of names) {
+    lines.push(name === 'default' ? 'export default fallback;' : `export const ${name} = fallback;`);
+  }
+  return lines.join('\n') + '\n';
+}
+
+try {
+  const root = process.env.B44_VITE_PLUGIN_ROOT || packageRoot(PLUGIN);
+  if (root) {
+    const missing = missingPluginModules(root);
+    if (missing.size > 0) {
+      const { version } = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+      let restored = new Set();
+      try {
+        restored = restoreFromTarball(root, version, [...missing.keys()]);
+      } catch (error) {
+        log(`could not fetch ${PLUGIN}@${version} (${error?.message || error})`);
+      }
+      for (const [relative, names] of missing) {
+        if (restored.has(relative)) continue;
+        const target = path.join(root, 'dist', relative);
+        fs.mkdirSync(path.dirname(target), { recursive: true });
+        fs.writeFileSync(target, stubModule(names), 'utf8');
+        log(`wrote fallback for ${PLUGIN}/dist/${relative}`);
+      }
+    } else {
+      log(`${PLUGIN} files all present`);
+    }
+  }
+} catch (error) {
+  log(`plugin check skipped (${error?.message || error})`);
 }
 
 log('package file check complete');

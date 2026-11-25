@@ -43,9 +43,36 @@ const sdkMissingFileFallback = {
   },
 };
 
+// Heavy third-party libraries are emitted as their own chunks. Besides keeping the
+// first load small, this keeps pre-minified vendor code in separate module scopes:
+// concatenated into the single app chunk it produced duplicate top-level bindings,
+// and the published bundle failed to parse (a blank page on every route).
+const VENDOR_CHUNKS = [
+  ['monaco', ['@monaco-editor', '/monaco-editor/']],
+  ['three', ['/three/']],
+  ['audio-meta', ['music-metadata', 'strtok3', 'token-types', 'readable-web-to-node-stream', '/debug/']],
+  ['mega', ['megajs']],
+  ['dash', ['dashjs']],
+  ['pdf', ['jspdf', 'html2canvas']],
+  ['charts', ['recharts', '/d3-']],
+];
+
+function manualChunks(id) {
+  if (!id.includes('node_modules')) return undefined;
+  for (const [chunk, markers] of VENDOR_CHUNKS) {
+    if (markers.some((marker) => id.includes(marker))) return chunk;
+  }
+  return undefined;
+}
+
 // https://vite.dev/config/
 export default defineConfig({
   logLevel: 'error', // Suppress warnings, only show errors
+  build: {
+    rollupOptions: {
+      output: { manualChunks },
+    },
+  },
   plugins: [
     sdkMissingFileFallback,
     base44({

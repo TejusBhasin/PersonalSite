@@ -11,6 +11,7 @@ async function invoke(name, payload = {}) {
 export const syncLibrary = () => invoke("syncMegaLibrary", {});
 export const getStreamCredentials = () => invoke("getStreamCredentials", {});
 export const createAiPlaylist = (prompt, count) => invoke("generateAiPlaylist", { prompt, count });
+export const verifyPasscode = (code) => invoke("mp3nowUnlock", { code });
 
 // Walks every page so libraries above the 5,000 record query cap load completely.
 export async function fetchAllRows(entityName, query = {}, pageSize = 500) {

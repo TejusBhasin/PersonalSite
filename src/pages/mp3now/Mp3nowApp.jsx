@@ -10,12 +10,26 @@ import Mp3nowPlaylistView from "@/components/mp3now/Mp3nowPlaylistView";
 import Mp3nowNowPlaying from "@/components/mp3now/Mp3nowNowPlaying";
 import Mp3nowAiSheet from "@/components/mp3now/Mp3nowAiSheet";
 import Mp3nowMiniPlayer from "@/components/mp3now/Mp3nowMiniPlayer";
+import Mp3nowUnlock from "@/components/mp3now/Mp3nowUnlock";
 import { Mp3nowPlayerProvider, usePlayer } from "@/lib/mp3now/player";
 import { invalidateLibrary, listPlaylists, playlistTracks, syncLibrary } from "@/lib/mp3now/api";
 import { listOfflineIds } from "@/lib/mp3now/offline";
 import { resolveTheme } from "@/lib/mp3now/settings";
 
+const UNLOCK_KEY = "mp3now:unlocked";
+
+// The passcode is asked once per device; after that the page goes straight to the
+// owner check below.
+function readUnlocked() {
+  try {
+    return window.localStorage.getItem(UNLOCK_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
 export default function Mp3nowApp() {
+  const [unlocked, setUnlocked] = useState(readUnlocked);
   const [gate, setGate] = useState("loading");
 
   usePwaHead();
@@ -36,6 +50,21 @@ export default function Mp3nowApp() {
       alive = false;
     };
   }, []);
+
+  if (!unlocked) {
+    return (
+      <Mp3nowUnlock
+        onUnlock={() => {
+          try {
+            window.localStorage.setItem(UNLOCK_KEY, "1");
+          } catch {
+            // Storage blocked: the passcode is simply asked again next visit.
+          }
+          setUnlocked(true);
+        }}
+      />
+    );
+  }
 
   if (gate === "loading") {
     return (

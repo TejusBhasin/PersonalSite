@@ -1,13 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { Box, Crosshair, Grid3x3 } from "lucide-react";
+import { Box, Crosshair, Grid3x3, Spline } from "lucide-react";
+
+// Edge overlays cost a full extra copy of the mesh, so they are only built for models small
+// enough that the outline still reads as a design aid rather than noise.
+const EDGE_LIMIT = 150000;
 
 export default function ScadViewport({ result, loading, emptyHint }) {
   const hostRef = useRef(null);
   const ctxRef = useRef(null);
   const [wireframe, setWireframe] = useState(false);
   const [grid, setGrid] = useState(true);
+  const [edges, setEdges] = useState(true);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -16,11 +21,12 @@ export default function ScadViewport({ result, loading, emptyHint }) {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0c1016);
 
-    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 8000);
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100000);
     camera.position.set(130, 110, 170);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    // A dense model is fill-rate bound: capping the pixel ratio keeps large models interactive.
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     renderer.domElement.style.display = "block";
     renderer.domElement.style.width = "100%";
     renderer.domElement.style.height = "100%";
@@ -46,8 +52,8 @@ export default function ScadViewport({ result, loading, emptyHint }) {
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.09;
-    controls.minDistance = 5;
-    controls.maxDistance = 4000;
+    controls.minDistance = 0.5;
+    controls.maxDistance = 100000;
 
     const group = new THREE.Group();
     scene.add(group);
@@ -83,14 +89,14 @@ export default function ScadViewport({ result, loading, emptyHint }) {
       }
       const size = box.getSize(new THREE.Vector3());
       const center = box.getCenter(new THREE.Vector3());
-      const radius = Math.max(size.length() * 0.7, 8);
+      const radius = Math.max(size.length() * 0.7, 0.5);
       const distance = (radius / Math.tan((camera.fov * Math.PI) / 360)) * 1.15;
       controls.target.copy(center);
       camera.position.copy(
         center.clone().add(new THREE.Vector3(0.85, 0.7, 1.1).normalize().multiplyScalar(distance))
       );
-      camera.near = Math.max(0.1, distance / 2000);
-      camera.far = distance * 30;
+      camera.near = Math.max(0.05, distance / 5000);
+      camera.far = distance * 40;
       camera.updateProjectionMatrix();
       controls.update();
     };
@@ -119,31 +125,40 @@ export default function ScadViewport({ result, loading, emptyHint }) {
     if (!mesh || !mesh.positions || mesh.positions.length === 0) return;
 
     const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute("position", new THREE.Float32BufferAttribute(mesh.positions, 3));
-    if (mesh.indices && mesh.indices.length) geometry.setIndex(mesh.indices);
-    geometry.computeVertexNormals();
+    geometry.setAttribute("position", new THREE.BufferAttribute(mesh.positions, 3));
+    // STL facets carry their own normals: using them skips a costly normal pass on big meshes
+    // and gives the flat faceted shading a CAD viewer should show.
+    if (mesh.hasNormals && mesh.normals) {
+      geometry.setAttribute("normal", new THREE.BufferAttribute(mesh.normals, 3));
+    } else {
+      geometry.computeVertexNormals();
+    }
     geometry.computeBoundingSphere();
 
     const solid = new THREE.Mesh(
       geometry,
       new THREE.MeshStandardMaterial({
         color: 0xd9e0ea,
-        metalness: 0.18,
-        roughness: 0.52,
+        metalness: 0.16,
+        roughness: 0.55,
         side: THREE.DoubleSide,
       })
     );
     solid.userData.kind = "solid";
     ctx.group.add(solid);
 
-    const edges = new THREE.LineSegments(
-      new THREE.EdgesGeometry(geometry, 30),
-      new THREE.LineBasicMaterial({ color: 0x93a1b3, transparent: true, opacity: 0.28 })
-    );
-    ctx.group.add(edges);
+    const triangles = mesh.triangles || mesh.positions.length / 9;
+    if (edges && triangles <= EDGE_LIMIT) {
+      const outline = new THREE.LineSegments(
+        new THREE.EdgesGeometry(geometry, 30),
+        new THREE.LineBasicMaterial({ color: 0x93a1b3, transparent: true, opacity: 0.28 })
+      );
+      outline.userData.kind = "edges";
+      ctx.group.add(outline);
+    }
 
     ctx.fit();
-  }, [result]);
+  }, [result, edges]);
 
   useEffect(() => {
     const ctx = ctxRef.current;
@@ -161,6 +176,8 @@ export default function ScadViewport({ result, loading, emptyHint }) {
   }, [grid]);
 
   const stats = result?.stats;
+  const triangles = stats?.triangles || 0;
+  const edgesAvailable = triangles > 0 && triangles <= EDGE_LIMIT;
 
   return (
     <div className="relative h-full w-full">
@@ -170,12 +187,13 @@ export default function ScadViewport({ result, loading, emptyHint }) {
         <span className={`scad-chip ${result?.ok ? "scad-chip-ok" : "scad-chip-warn"}`}>
           {result?.engineLabel || "no geometry"}
         </span>
-        {stats?.triangles > 0 && <span className="scad-chip">{stats.triangles} tris</span>}
+        {triangles > 0 && <span className="scad-chip">{triangles.toLocaleString()} tris</span>}
         {stats?.sizeMm && (
           <span className="scad-chip">
             {stats.sizeMm[0]} × {stats.sizeMm[1]} × {stats.sizeMm[2]} mm
           </span>
         )}
+        {result?.durationMs > 0 && <span className="scad-chip">{result.durationMs} ms</span>}
       </div>
 
       <div className="absolute right-3 top-3 flex items-center gap-1.5">
@@ -186,6 +204,15 @@ export default function ScadViewport({ result, loading, emptyHint }) {
           title="Toggle wireframe"
         >
           <Box className="h-3.5 w-3.5" />
+        </button>
+        <button
+          type="button"
+          onClick={() => setEdges((v) => !v)}
+          disabled={!edgesAvailable}
+          className="scad-btn scad-btn-sm"
+          title={edgesAvailable ? "Toggle facet edges" : "Facet edges are off for very dense models"}
+        >
+          <Spline className="h-3.5 w-3.5" />
         </button>
         <button
           type="button"

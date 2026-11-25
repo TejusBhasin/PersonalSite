@@ -107,7 +107,7 @@ export default function ScadSlice() {
   const busy = Boolean(stage);
 
   const runSlice = async () => {
-    if (!compiled?.geoms?.length) {
+    if (!compiled?.ok) {
       setNotice("This project has no compiled geometry to slice.");
       return;
     }
@@ -115,7 +115,7 @@ export default function ScadSlice() {
     setGcode("");
     setStage("engine");
     try {
-      const { blob } = buildExport(compiled.geoms, "stl-ascii", project.title);
+      const { blob } = buildExport(compiled, "stl-ascii", project.title);
       const stl = await blob.text();
       const result = await sliceStl({ stl, options, onStage: setStage });
       setGcode(result);
@@ -197,7 +197,7 @@ export default function ScadSlice() {
               <button
                 type="button"
                 onClick={runSlice}
-                disabled={busy || !compiled?.geoms?.length}
+                disabled={busy || !compiled?.ok}
                 className="scad-btn scad-btn-primary"
               >
                 {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Printer className="h-3.5 w-3.5" />}
@@ -224,7 +224,7 @@ export default function ScadSlice() {
               </p>
             )}
 
-            {!compiling && !compiled?.geoms?.length && (
+            {!compiling && !compiled?.ok && (
               <p className="mt-2 flex items-start gap-1.5 text-[11px] leading-relaxed" style={{ color: "#ecc178" }}>
                 <TriangleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                 This source did not produce any solid geometry, so there is nothing to slice. Open it in

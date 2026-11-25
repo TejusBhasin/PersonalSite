@@ -3,15 +3,24 @@
 //
 // The compiler is a single self-contained module (~14 MB, cached by the browser). It is
 // imported lazily the first time a model is compiled and run inside a worker so typing in
-// the editor never blocks. The public shape matches the old engine exactly:
-//   compileOpenScad(source) -> { ok, mesh, geoms, diagnostics, stats, engine, engineLabel }
+// the editor never blocks. Large, intricate models are rendered with the manifold backend
+// (the playground's default), and any run that stops without producing geometry is retried
+// on a fresh compiler instance instead of failing.
+//
+//   compileOpenScad(source, { onStatus }) -> { ok, mesh, geoms, diagnostics, stats }
 
 import { geometries } from "@jscad/modeling";
 
 export const ENGINE_ID = "openscad-wasm";
-export const ENGINE_LABEL = "OpenSCAD 2021 (WASM)";
+export const ENGINE_LABEL = "OpenSCAD (WASM)";
 
 const COMPILER_URL = "https://cdn.jsdelivr.net/npm/openscad-wasm@0.0.4/openscad.js";
+
+// How many times a run that died without geometry is retried before giving up.
+const MAX_ATTEMPTS = 3;
+// Above this triangle count the jscad solids are skipped: they double the memory for
+// nothing, since STL exports are written straight from the compiled bytes.
+const GEOM_LIMIT = 200000;
 
 const WORKER_SOURCE = `
 let factoryPromise = null;
@@ -44,7 +53,7 @@ function getApi() {
   return apiPromise;
 }
 
-async function compile(source) {
+async function compile(source, args) {
   logSink = [];
   const api = await getApi();
   try {
@@ -53,17 +62,14 @@ async function compile(source) {
     // nothing to clear
   }
   api.FS.writeFile("model.scad", source);
-  let exitCode = 0;
-  try {
-    exitCode = api.callMain(["model.scad", "--export-format", "binstl", "-o", "out.stl"]);
-  } catch (error) {
-    exitCode = -1;
-    apiPromise = null;
-    logSink.push("ERROR: " + (typeof error === "number" ? "the compiler stopped (" + error + ")" : String(error)));
-  }
+  // A throw here (abort / out of memory) is rethrown so the host retries on a fresh instance.
+  const exitCode = api.callMain(["model.scad", "-o", "out.stl", ...args]);
   let bytes = null;
   try {
-    bytes = api.FS.readFile("out.stl");
+    const raw = api.FS.readFile("out.stl");
+    // Copy out of the wasm heap so the buffer can be transferred instead of copied again.
+    bytes = new Uint8Array(raw.length);
+    bytes.set(raw);
   } catch (error) {
     bytes = null;
   }
@@ -71,11 +77,13 @@ async function compile(source) {
 }
 
 self.onmessage = async (event) => {
-  const { id, source } = event.data || {};
+  const { id, source, args } = event.data || {};
   try {
-    const result = await compile(String(source || ""));
-    self.postMessage({ id, exitCode: result.exitCode, logs: result.logs, bytes: result.bytes });
+    const result = await compile(String(source || ""), Array.isArray(args) ? args : []);
+    const payload = { id, exitCode: result.exitCode, logs: result.logs, bytes: result.bytes };
+    self.postMessage(payload, result.bytes ? [result.bytes.buffer] : []);
   } catch (error) {
+    apiPromise = null;
     self.postMessage({ id, fatal: String((error && error.message) || error) });
   }
 };
@@ -100,26 +108,31 @@ function startWorker() {
     const error = new Error(event?.message || "The OpenSCAD compiler could not start.");
     waiting.forEach((entry) => entry.reject(error));
     waiting.clear();
-    workerUnavailable = true;
-    worker?.terminate();
-    worker = null;
+    resetWorker();
   };
   return instance;
 }
 
-function compileInWorker(source) {
+function resetWorker() {
+  if (worker) worker.terminate();
+  worker = null;
+  waiting.forEach((entry) => entry.reject(new Error("The compiler restarted.")));
+  waiting.clear();
+}
+
+function compileInWorker(source, args) {
   return new Promise((resolve, reject) => {
     if (!worker) worker = startWorker();
     const id = ++sequence;
     waiting.set(id, { resolve, reject });
-    worker.postMessage({ id, source });
+    worker.postMessage({ id, source, args });
   });
 }
 
 // Fallback for browsers that block workers created from a blob.
 let mainThreadFactory = null;
 
-async function compileOnMainThread(source) {
+async function compileOnMainThread(source, args) {
   if (!mainThreadFactory) {
     mainThreadFactory = import(/* @vite-ignore */ COMPILER_URL).then(
       (mod) => mod.createOpenSCAD || mod.default
@@ -138,35 +151,62 @@ async function compileOnMainThread(source) {
     // nothing to clear
   }
   api.FS.writeFile("model.scad", source);
-  let exitCode = 0;
-  try {
-    exitCode = api.callMain(["model.scad", "--export-format", "binstl", "-o", "out.stl"]);
-  } catch (error) {
-    exitCode = -1;
-    logs.push("ERROR: " + (typeof error === "number" ? "the compiler stopped (" + error + ")" : String(error)));
-  }
+  const exitCode = api.callMain(["model.scad", "-o", "out.stl", ...args]);
   let bytes = null;
   try {
-    bytes = api.FS.readFile("out.stl");
+    const raw = api.FS.readFile("out.stl");
+    bytes = new Uint8Array(raw.length);
+    bytes.set(raw);
   } catch (error) {
     bytes = null;
   }
   return { exitCode, logs, bytes };
 }
 
-async function runCompiler(source) {
+async function runCompiler(source, args) {
   if (!workerUnavailable) {
     try {
-      const data = await compileInWorker(source);
+      if (!worker) worker = startWorker();
+    } catch (error) {
+      workerUnavailable = true;
+      return compileOnMainThread(source, args);
+    }
+    try {
+      const data = await compileInWorker(source, args);
       if (data.fatal) throw new Error(data.fatal);
       return data;
     } catch (error) {
-      workerUnavailable = true;
-      worker?.terminate();
-      worker = null;
+      resetWorker();
+      throw error;
     }
   }
-  return compileOnMainThread(source);
+  return compileOnMainThread(source, args);
+}
+
+// The manifold backend handles intricate CSG far beyond CGAL's reach. Builds that predate it
+// reject the flag, so it is dropped the first time the compiler says it does not know it.
+let manifoldEnabled = true;
+
+function compilerArgs() {
+  const args = ["--export-format", "binstl"];
+  // Manifold is the backend that copes with genuinely intricate CSG; without it the run
+  // falls back to the CGAL kernel, which is slower but always present.
+  if (manifoldEnabled) args.push("--backend=manifold");
+  return args;
+}
+
+function backendRejected(logs) {
+  return /unknown backend|invalid backend|backend.*(not|un)supported|unrecognized (option|argument)/i.test(
+    (logs || []).join("\n")
+  );
+}
+
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function now() {
+  return typeof performance !== "undefined" ? performance.now() : Date.now();
 }
 
 function parseLogs(logs, exitCode) {
@@ -192,40 +232,50 @@ function parseLogs(logs, exitCode) {
   return out;
 }
 
+function firstError(logs) {
+  const line = (logs || []).find((entry) => /^ERROR/i.test(String(entry).trim()));
+  return line ? String(line).trim() : "";
+}
+
 function meshFromStl(bytes) {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const count = view.getUint32(80, true);
   const positions = new Float32Array(count * 9);
-  const indices = new Uint32Array(count * 3);
+  const normals = new Float32Array(count * 9);
   let offset = 84;
+  let hasNormals = false;
   for (let triangle = 0; triangle < count; triangle++) {
+    const nx = view.getFloat32(offset, true);
+    const ny = view.getFloat32(offset + 4, true);
+    const nz = view.getFloat32(offset + 8, true);
+    if (nx || ny || nz) hasNormals = true;
     offset += 12;
     for (let corner = 0; corner < 3; corner++) {
       const base = triangle * 9 + corner * 3;
       positions[base] = view.getFloat32(offset, true);
       positions[base + 1] = view.getFloat32(offset + 4, true);
       positions[base + 2] = view.getFloat32(offset + 8, true);
-      indices[triangle * 3 + corner] = triangle * 3 + corner;
+      normals[base] = nx;
+      normals[base + 1] = ny;
+      normals[base + 2] = nz;
       offset += 12;
     }
     offset += 2;
   }
-  return { positions, indices };
+  return { positions, normals, hasNormals, triangles: count };
 }
 
 function solidFromMesh(mesh) {
   const triangles = [];
-  for (let i = 0; i < mesh.indices.length; i += 3) {
-    const corners = [];
-    for (let corner = 0; corner < 3; corner++) {
-      const base = mesh.indices[i + corner] * 3;
-      corners.push([
-        mesh.positions[base],
-        mesh.positions[base + 1],
-        mesh.positions[base + 2],
-      ]);
-    }
-    triangles.push(geometries.poly3.create(corners));
+  const p = mesh.positions;
+  for (let i = 0; i < p.length; i += 9) {
+    triangles.push(
+      geometries.poly3.create([
+        [p[i], p[i + 1], p[i + 2]],
+        [p[i + 3], p[i + 4], p[i + 5]],
+        [p[i + 6], p[i + 7], p[i + 8]],
+      ])
+    );
   }
   return geometries.geom3.create(triangles);
 }
@@ -246,19 +296,54 @@ function boundsOf(positions) {
   return [maxX - minX, maxY - minY, maxZ - minZ].map((n) => Math.round(n * 100) / 100);
 }
 
-export async function compileOpenScad(source) {
-  const started = typeof performance !== "undefined" ? performance.now() : Date.now();
+/**
+ * Compile OpenSCAD source to geometry.
+ * Runs that stop without geometry (crash, out of memory, engine hiccup) are retried on a
+ * fresh compiler up to MAX_ATTEMPTS times, so a heavy model keeps trying instead of failing.
+ */
+export async function compileOpenScad(source, options = {}) {
+  const onStatus = typeof options.onStatus === "function" ? options.onStatus : null;
   const text = String(source || "");
-  const raw = await runCompiler(text);
+  const started = now();
+
+  let raw = null;
+  let lastError = null;
+  let attempt = 0;
+
+  while (attempt < MAX_ATTEMPTS) {
+    attempt += 1;
+    if (onStatus) onStatus({ attempt, maxAttempts: MAX_ATTEMPTS });
+    try {
+      raw = await runCompiler(text, compilerArgs());
+      if (manifoldEnabled && backendRejected(raw.logs)) {
+        manifoldEnabled = false;
+        raw = await runCompiler(text, compilerArgs());
+      }
+      lastError = null;
+      const produced = raw.bytes && raw.bytes.length > 84;
+      if (raw.exitCode === 0 && produced) break;
+      // A syntax or modelling error in the source will not change on a retry.
+      if (firstError(raw.logs)) break;
+      // It ran to the end and simply had nothing to output (an empty model).
+      if (raw.exitCode === 0) break;
+      throw new Error("The compiler stopped before producing geometry.");
+    } catch (error) {
+      lastError = error;
+      resetWorker();
+      if (attempt < MAX_ATTEMPTS) await delay(350 * attempt);
+    }
+  }
+
+  if (!raw) throw lastError || new Error("The OpenSCAD compiler could not run.");
+
   const diagnostics = parseLogs(raw.logs, raw.exitCode);
   const bytes = raw.bytes;
-  const triangles = bytes && bytes.length >= 84
+  const triangleCount = bytes && bytes.length >= 84
     ? new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).getUint32(80, true)
     : 0;
+  const durationMs = Math.round(now() - started);
 
-  const durationMs = Math.round((typeof performance !== "undefined" ? performance.now() : Date.now()) - started);
-
-  if (!triangles || raw.exitCode !== 0) {
+  if (!triangleCount || raw.exitCode !== 0) {
     return {
       engine: ENGINE_ID,
       engineLabel: ENGINE_LABEL,
@@ -268,18 +353,22 @@ export async function compileOpenScad(source) {
       diagnostics,
       stats: { triangles: 0, solids: 0, sizeMm: null },
       durationMs,
+      attempts: attempt,
     };
   }
 
+  // The STL bytes are only a transport: the mesh is what the viewport and the exports use,
+  // so the bytes are dropped here instead of being held for the life of the result.
   const mesh = meshFromStl(bytes);
   return {
     engine: ENGINE_ID,
     engineLabel: ENGINE_LABEL,
     ok: true,
     mesh,
-    geoms: [solidFromMesh(mesh)],
+    geoms: triangleCount <= GEOM_LIMIT ? [solidFromMesh(mesh)] : [],
     diagnostics,
-    stats: { triangles, solids: 1, sizeMm: boundsOf(mesh.positions) },
+    stats: { triangles: triangleCount, solids: 1, sizeMm: boundsOf(mesh.positions) },
     durationMs,
+    attempts: attempt,
   };
 }

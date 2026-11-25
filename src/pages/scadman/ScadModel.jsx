@@ -115,14 +115,14 @@ export default function ScadModel() {
   };
 
   const download = (format) => {
-    const geoms = compile.result?.geoms || [];
-    if (!geoms.length) {
+    const compiled = compile.result;
+    if (!compiled?.ok) {
       setNotice("Nothing has compiled yet.");
       return;
     }
     setExporting(format);
     try {
-      const { blob, filename } = buildExport(geoms, format, project.title);
+      const { blob, filename } = buildExport(compiled, format, project.title);
       downloadBlob(blob, filename);
       setNotice(`${filename} · ${formatBytes(blob.size)}`);
     } catch (e) {
@@ -276,7 +276,7 @@ export default function ScadModel() {
         <button
           type="button"
           onClick={() => download("stl-binary")}
-          disabled={!compile.result?.geoms?.length || Boolean(exporting)}
+          disabled={!compile.result?.ok || Boolean(exporting)}
           className="scad-btn"
           title="Download a binary STL of the current geometry"
         >
@@ -285,7 +285,7 @@ export default function ScadModel() {
         <button
           type="button"
           onClick={() => download("3mf")}
-          disabled={!compile.result?.geoms?.length || Boolean(exporting)}
+          disabled={!compile.result?.ok || Boolean(exporting)}
           className="scad-btn"
           title="Download a 3MF package of the current geometry"
         >

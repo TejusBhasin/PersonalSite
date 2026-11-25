@@ -6,6 +6,7 @@ import {
   Columns2,
   Download,
   Eye,
+  FolderOpen,
   History,
   Printer,
   Redo2,
@@ -33,7 +34,7 @@ import { detectParameters, mergeParameters, parametersSignature } from "@/lib/sc
 import { EXPORT_FORMATS, buildExport, downloadBlob } from "@/lib/scad/exportMesh";
 import useScadProfile from "@/hooks/useScadProfile";
 import ScadAiPanel from "@/components/scadman/ScadAiPanel";
-import ScadCodeEditor from "@/components/scadman/ScadCodeEditor";
+import ScadMonacoEditor from "@/components/scadman/ScadMonacoEditor";
 import ScadViewport from "@/components/scadman/ScadViewport";
 import ScadParamPanel from "@/components/scadman/ScadParamPanel";
 import ScadPrintPanel from "@/components/scadman/ScadPrintPanel";
@@ -65,6 +66,8 @@ export default function ScadEditor() {
   const [streaming, setStreaming] = useState(false);
   const [lastPrompt, setLastPrompt] = useState("");
   const [compile, setCompile] = useState({ loading: false, result: null, error: "" });
+  const [compileAttempt, setCompileAttempt] = useState(0);
+  const [compileTick, setCompileTick] = useState(0);
   const [saveState, setSaveState] = useState("saved");
   const [notice, setNotice] = useState("");
   const [view, setView] = useState("split");
@@ -75,6 +78,9 @@ export default function ScadEditor() {
   const [exporting, setExporting] = useState("");
 
   const editorRef = useRef(null);
+  const fileRef = useRef(null);
+  const runningRef = useRef(false);
+  const pendingRef = useRef(false);
   const paramsRef = useRef([]);
   const storedRef = useRef([]);
   const storedSignature = useRef("");
@@ -154,27 +160,38 @@ export default function ScadEditor() {
       setCompile({ loading: false, result: null, error: "" });
       return;
     }
-    let alive = true;
-    setCompile((current) => ({ ...current, loading: true, error: "" }));
     const timer = setTimeout(async () => {
+      // One compile at a time: a model heavy enough to take a minute must not pile up a new
+      // run on every keystroke. A change made mid-run is picked up as soon as it finishes.
+      if (runningRef.current) {
+        pendingRef.current = true;
+        return;
+      }
+      runningRef.current = true;
+      setCompile((current) => ({ ...current, loading: true, error: "" }));
+      setCompileAttempt(1);
       try {
-        const result = await compileOpenScad(code);
-        if (alive) setCompile({ loading: false, result, error: "" });
+        const result = await compileOpenScad(code, {
+          onStatus: ({ attempt }) => setCompileAttempt(attempt),
+        });
+        setCompile({ loading: false, result, error: "" });
       } catch (e) {
-        if (alive) {
-          setCompile({
-            loading: false,
-            result: null,
-            error: e.message || "The OpenSCAD compiler could not start.",
-          });
+        setCompile({
+          loading: false,
+          result: null,
+          error: e?.message || "The OpenSCAD compiler could not start.",
+        });
+      } finally {
+        runningRef.current = false;
+        setCompileAttempt(0);
+        if (pendingRef.current) {
+          pendingRef.current = false;
+          setCompileTick((n) => n + 1);
         }
       }
     }, 350);
-    return () => {
-      alive = false;
-      clearTimeout(timer);
-    };
-  }, [code]);
+    return () => clearTimeout(timer);
+  }, [code, compileTick]);
 
   const dirty = code !== savedCode;
 
@@ -419,20 +436,34 @@ export default function ScadEditor() {
     notify(`Restored version ${version.version_number}.`);
   };
 
+  const loadFile = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    const text = await file.text();
+    if (!text.trim()) {
+      notify("That file is empty.");
+      return;
+    }
+    setCode(text);
+    await persist(text, `Uploaded ${file.name}`, { syncParams: true });
+    notify(`${file.name} loaded into the editor.`);
+  };
+
   const leave = () => {
     if (dirty && !window.confirm("You have unsaved changes. Leave anyway?")) return;
     navigate("/scadman/projects");
   };
 
   const exportAs = async (format) => {
-    const geoms = compile.result?.geoms || [];
-    if (!geoms.length) {
+    const compiled = compile.result;
+    if (!compiled?.ok) {
       notify("Nothing to export yet — the model has not compiled.");
       return;
     }
     setExporting(format);
     try {
-      const { blob, filename, format: chosen } = buildExport(geoms, format, project.title);
+      const { blob, filename, format: chosen } = buildExport(compiled, format, project.title);
       downloadBlob(blob, filename);
       notify(`${filename} · ${formatBytes(blob.size)}`);
       base44.entities.ScadExport.create({
@@ -653,11 +684,26 @@ export default function ScadEditor() {
           <Save className="h-3.5 w-3.5" />
           Save
         </button>
+        <button
+          type="button"
+          onClick={() => fileRef.current?.click()}
+          className="scad-btn scad-btn-sm"
+          title="Load a .scad file into the editor"
+        >
+          <FolderOpen className="h-3.5 w-3.5" />
+        </button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept=".scad,.txt,text/plain"
+          className="hidden"
+          onChange={loadFile}
+        />
         <div className="relative">
           <button
             type="button"
             onClick={() => setExportOpen((open) => !open)}
-            disabled={!compile.result?.geoms?.length || Boolean(exporting)}
+            disabled={!compile.result?.ok || Boolean(exporting)}
             className="scad-btn scad-btn-sm"
             title="Export STL / 3MF"
           >
@@ -711,11 +757,12 @@ export default function ScadEditor() {
             <div className="flex min-h-0 flex-1">
               {view !== "preview" && (
                 <div className={`min-w-0 ${view === "split" ? "flex-1 border-r" : "flex-1"}`} style={{ borderColor: "var(--scad-line)" }}>
-                  <ScadCodeEditor
+                  <ScadMonacoEditor
                     ref={editorRef}
                     value={code}
                     onChange={setCode}
                     fontSize={profile?.editor_font_size || 12}
+                    tabSize={profile?.editor_tab_width || 2}
                   />
                 </div>
               )}
@@ -732,6 +779,7 @@ export default function ScadEditor() {
               stats={compile.result?.stats}
               engineLabel={compile.result?.engineLabel}
               loading={compile.loading}
+              attempt={compileAttempt}
               onFix={fixWithAi}
               fixing={aiBusy}
             />
@@ -749,11 +797,12 @@ export default function ScadEditor() {
           <div className="min-h-0 flex-1">
             {pane === "ai" && aiPanel}
             {pane === "code" && (
-              <ScadCodeEditor
+              <ScadMonacoEditor
                 ref={editorRef}
                 value={code}
                 onChange={setCode}
                 fontSize={profile?.editor_font_size || 12}
+                tabSize={profile?.editor_tab_width || 2}
               />
             )}
             {pane === "preview" && <ScadViewport result={compile.result} loading={compile.loading} />}
@@ -766,6 +815,7 @@ export default function ScadEditor() {
               stats={compile.result?.stats}
               engineLabel={compile.result?.engineLabel}
               loading={compile.loading}
+              attempt={compileAttempt}
               onFix={fixWithAi}
               fixing={aiBusy}
             />
@@ -797,7 +847,7 @@ export default function ScadEditor() {
   );
 }
 
-function DiagnosticsBar({ errors, warnings, error, stats, engineLabel, loading, onFix, fixing }) {
+function DiagnosticsBar({ errors, warnings, error, stats, engineLabel, loading, attempt, onFix, fixing }) {
   const [open, setOpen] = useState(false);
   const problem = errors[0] || null;
 
@@ -827,7 +877,9 @@ function DiagnosticsBar({ errors, warnings, error, stats, engineLabel, loading, 
             ? `Line ${problem.line || "?"}: ${problem.message}`
             : error ||
               (loading
-                ? "Compiling with OpenSCAD. The first run downloads the compiler once."
+                ? attempt > 1
+                  ? `Compiling with OpenSCAD, attempt ${attempt} of 3. A heavy model is retried rather than given up on.`
+                  : "Compiling with OpenSCAD. The first run downloads the compiler once."
                 : "Compiled by the real OpenSCAD kernel. Warnings appear here.")}
         </span>
         {errors.length > 0 && onFix && (

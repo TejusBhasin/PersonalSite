@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import Mp3nowShell from "@/components/mp3now/Mp3nowShell";
 import Mp3nowHome from "@/components/mp3now/Mp3nowHome";
@@ -59,6 +59,7 @@ function Experience() {
   const [aiOpen, setAiOpen] = useState(false);
   const [notice, setNotice] = useState("");
   const [syncState, setSyncState] = useState({ busy: false, message: "", error: "" });
+  const autoSyncStarted = useRef(false);
 
   useEffect(() => {
     const query = window.matchMedia("(prefers-color-scheme: dark)");
@@ -129,6 +130,14 @@ function Experience() {
       setSyncState({ busy: false, message: "", error: error.message || "The MEGA sync failed." });
     }
   };
+
+  // Every passcode login re-reads the MEGA folders, so files added there show up without
+  // pressing sync. Cached playlists render first; the list refreshes when the pull finishes.
+  useEffect(() => {
+    if (autoSyncStarted.current) return;
+    autoSyncStarted.current = true;
+    runSync();
+  }, []);
 
   const onStartListening = async () => {
     try {

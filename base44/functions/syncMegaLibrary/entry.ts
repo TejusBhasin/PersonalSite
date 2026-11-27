@@ -1,7 +1,7 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.54";
 import { File } from "npm:megajs@1.3.10";
 import { secrets } from "base44:runtime";
-import { requireAdmin, fetchAllPages, chunk } from "../../shared/mp3nowAuth.ts";
+import { requirePass, fetchAllPages, chunk } from "../../shared/mp3nowAuth.ts";
 
 const AUDIO = /\.(mp3|m4a|m4b|aac|flac|wav|ogg|oga|opus)$/i;
 const MAX_FILES = 12000;
@@ -49,7 +49,8 @@ async function walk(node, path, out) {
 
 export default async function (req) {
   try {
-    const { error, base44 } = await requireAdmin(req);
+    const body = await req.json().catch(() => ({}));
+    const { error, base44 } = await requirePass(req, body.pass);
     if (error) return error;
 
     const folderUrl = secrets.get("MEGA_FOLDER_URL");

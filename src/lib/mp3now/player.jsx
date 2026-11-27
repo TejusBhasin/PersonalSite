@@ -1,9 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { base44 } from "@/api/base44Client";
 import { fetchTrackBlob } from "@/lib/mp3now/mega";
 import { readTags } from "@/lib/mp3now/id3";
 import { getOfflineBlob, putOfflineTrack, removeOfflineTrack } from "@/lib/mp3now/offline";
-import { fillPlaylistArt, getTrackPool } from "@/lib/mp3now/api";
+import { fillPlaylistArt, getTrackPool, updateTrackMeta } from "@/lib/mp3now/api";
 import { loadSettings, saveSettings } from "@/lib/mp3now/settings";
 
 const PlayerContext = createContext(null);
@@ -73,7 +72,7 @@ export function Mp3nowPlayerProvider({ children }) {
     if (tags.genre) patch.genre = tags.genre;
     if (tags.duration) patch.duration = tags.duration;
     if (tags.coverArtDataUrl) patch.coverArtDataUrl = tags.coverArtDataUrl;
-    await base44.entities.Track.update(track.id, patch);
+    await updateTrackMeta(track.id, patch);
     setQueue((list) =>
       list.map((item) => (item.track.id === track.id ? { ...item, track: { ...item.track, ...patch } } : item))
     );

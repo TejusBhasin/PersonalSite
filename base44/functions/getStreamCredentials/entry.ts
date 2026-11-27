@@ -1,11 +1,12 @@
 import { secrets } from "base44:runtime";
-import { requireAdmin } from "../../shared/mp3nowAuth.ts";
+import { requirePass } from "../../shared/mp3nowAuth.ts";
 
-// Hands the shared folder link to the signed-in owner so the browser can decrypt audio
-// locally. Never downloaded or returned by any other route.
+// Hands the shared folder link to a device that has entered the MP3now passcode so the
+// browser can decrypt audio locally. Never downloaded or returned by any other route.
 export default async function (req) {
   try {
-    const { error } = await requireAdmin(req);
+    const body = await req.json().catch(() => ({}));
+    const { error } = await requirePass(req, body.pass);
     if (error) return error;
 
     const url = secrets.get("MEGA_FOLDER_URL");

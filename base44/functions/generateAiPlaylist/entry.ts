@@ -1,4 +1,4 @@
-import { requireAdmin, fetchAllPages } from "../../shared/mp3nowAuth.ts";
+import { requirePass, fetchAllPages } from "../../shared/mp3nowAuth.ts";
 
 const MAX_INDEX = 1500;
 
@@ -8,10 +8,10 @@ function compactLine(track) {
 
 export default async function (req) {
   try {
-    const { error, base44 } = await requireAdmin(req);
+    const body = await req.json().catch(() => ({}));
+    const { error, base44 } = await requirePass(req, body.pass);
     if (error) return error;
 
-    const body = await req.json().catch(() => ({}));
     const prompt = String(body.prompt || "").trim();
     if (!prompt) return Response.json({ error: "Describe the playlist you want." }, { status: 400 });
 

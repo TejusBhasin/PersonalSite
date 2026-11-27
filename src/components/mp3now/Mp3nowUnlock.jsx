@@ -14,7 +14,7 @@ export default function Mp3nowUnlock({ onUnlock }) {
     setError("");
     try {
       const data = await verifyPasscode(code.trim());
-      if (data.ok) onUnlock();
+      if (data.ok && data.token) onUnlock(data.token);
       else setError("That passcode is not correct.");
     } catch (e) {
       setError(e?.response?.data?.error || e.message || "Could not check the passcode.");

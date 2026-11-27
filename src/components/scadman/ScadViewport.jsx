@@ -6,6 +6,9 @@ import { Box, Crosshair, Grid3x3, Spline } from "lucide-react";
 // Edge overlays cost a full extra copy of the mesh, so they are only built for models small
 // enough that the outline still reads as a design aid rather than noise.
 const EDGE_LIMIT = 150000;
+// Past this size the viewport renders at one device pixel per CSS pixel: a dense model is
+// fill-rate bound, and a sharper buffer only makes orbiting stutter.
+const DENSE_LIMIT = 300000;
 
 export default function ScadViewport({ result, loading, emptyHint }) {
   const hostRef = useRef(null);
@@ -25,7 +28,6 @@ export default function ScadViewport({ result, loading, emptyHint }) {
     camera.position.set(130, 110, 170);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
-    // A dense model is fill-rate bound: capping the pixel ratio keeps large models interactive.
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     renderer.domElement.style.display = "block";
     renderer.domElement.style.width = "100%";
@@ -58,12 +60,21 @@ export default function ScadViewport({ result, loading, emptyHint }) {
     const group = new THREE.Group();
     scene.add(group);
 
+    // Draw on demand. A million-triangle model costs the GPU on every frame, and the camera
+    // moving is the only thing that needs a new one, so an idle viewport draws nothing.
+    let dirty = true;
+    const requestRender = () => {
+      dirty = true;
+    };
+    controls.addEventListener("change", requestRender);
+
     const resize = () => {
       const w = host.clientWidth || 1;
       const h = host.clientHeight || 1;
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
+      requestRender();
     };
     resize();
     const observer = new ResizeObserver(resize);
@@ -71,23 +82,51 @@ export default function ScadViewport({ result, loading, emptyHint }) {
 
     let frame = 0;
     const tick = () => {
-      controls.update();
-      renderer.render(scene, camera);
+      const moved = controls.update();
+      if (moved || dirty) {
+        renderer.render(scene, camera);
+        dirty = false;
+      }
       frame = requestAnimationFrame(tick);
     };
     tick();
 
-    ctxRef.current = { scene, camera, renderer, controls, group, gridHelper, axes, fit: null };
+    ctxRef.current = {
+      scene,
+      camera,
+      renderer,
+      controls,
+      group,
+      gridHelper,
+      axes,
+      requestRender,
+      fit: null,
+      lastSize: null,
+      hasFitted: false,
+    };
 
-    ctxRef.current.fit = () => {
+    // `force` is the Fit button: it always recentres. A fresh compile only recentres when the
+    // model actually changed shape, so the camera stops jumping while you type.
+    ctxRef.current.fit = (force = false) => {
       const box = new THREE.Box3().setFromObject(group);
       if (box.isEmpty()) {
+        ctxRef.current.lastSize = null;
+        ctxRef.current.hasFitted = false;
         controls.target.set(0, 0, 0);
         camera.position.set(130, 110, 170);
         controls.update();
+        requestRender();
         return;
       }
       const size = box.getSize(new THREE.Vector3());
+      const previous = ctxRef.current.lastSize;
+      const grown = !previous || size.clone().sub(previous).length() > Math.max(previous.length(), 1) * 0.2;
+      ctxRef.current.lastSize = size.clone();
+      if (!force && ctxRef.current.hasFitted && !grown) {
+        requestRender();
+        return;
+      }
+      ctxRef.current.hasFitted = true;
       const center = box.getCenter(new THREE.Vector3());
       const radius = Math.max(size.length() * 0.7, 0.5);
       const distance = (radius / Math.tan((camera.fov * Math.PI) / 360)) * 1.15;
@@ -99,11 +138,13 @@ export default function ScadViewport({ result, loading, emptyHint }) {
       camera.far = distance * 40;
       camera.updateProjectionMatrix();
       controls.update();
+      requestRender();
     };
 
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
+      controls.removeEventListener("change", requestRender);
       controls.dispose();
       renderer.dispose();
       if (renderer.domElement.parentNode === host) host.removeChild(renderer.domElement);
@@ -122,7 +163,15 @@ export default function ScadViewport({ result, loading, emptyHint }) {
     }
 
     const mesh = result?.mesh;
-    if (!mesh || !mesh.positions || mesh.positions.length === 0) return;
+    if (!mesh || !mesh.positions || mesh.positions.length === 0) {
+      ctx.requestRender();
+      return;
+    }
+
+    const triangles = mesh.triangles || mesh.positions.length / 9;
+    ctx.renderer.setPixelRatio(
+      triangles > DENSE_LIMIT ? 1 : Math.min(window.devicePixelRatio || 1, 1.5)
+    );
 
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute("position", new THREE.BufferAttribute(mesh.positions, 3));
@@ -142,12 +191,12 @@ export default function ScadViewport({ result, loading, emptyHint }) {
         metalness: 0.16,
         roughness: 0.55,
         side: THREE.DoubleSide,
+        wireframe,
       })
     );
     solid.userData.kind = "solid";
     ctx.group.add(solid);
 
-    const triangles = mesh.triangles || mesh.positions.length / 9;
     if (edges && triangles <= EDGE_LIMIT) {
       const outline = new THREE.LineSegments(
         new THREE.EdgesGeometry(geometry, 30),
@@ -166,6 +215,7 @@ export default function ScadViewport({ result, loading, emptyHint }) {
     ctx.group.traverse((child) => {
       if (child.isMesh && child.userData.kind === "solid") child.material.wireframe = wireframe;
     });
+    ctx.requestRender();
   }, [wireframe, result]);
 
   useEffect(() => {
@@ -173,6 +223,7 @@ export default function ScadViewport({ result, loading, emptyHint }) {
     if (!ctx) return;
     ctx.gridHelper.visible = grid;
     ctx.axes.visible = grid;
+    ctx.requestRender();
   }, [grid]);
 
   const stats = result?.stats;
@@ -224,7 +275,7 @@ export default function ScadViewport({ result, loading, emptyHint }) {
         </button>
         <button
           type="button"
-          onClick={() => ctxRef.current?.fit?.()}
+          onClick={() => ctxRef.current?.fit?.(true)}
           className="scad-btn scad-btn-sm"
           title="Fit model to view"
         >

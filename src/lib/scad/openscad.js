@@ -16,8 +16,9 @@ export const ENGINE_LABEL = "OpenSCAD (WASM)";
 
 const COMPILER_URL = "https://cdn.jsdelivr.net/npm/openscad-wasm@0.0.4/openscad.js";
 
-// How many times a run that died without geometry is retried before giving up.
-const MAX_ATTEMPTS = 3;
+// How many times a run that died without geometry is retried before giving up. Heavy models
+// die more often (memory pressure, a slow kernel), so they get one more try than they used to.
+const MAX_ATTEMPTS = 4;
 // Above this triangle count the jscad solids are skipped: they double the memory for
 // nothing, since STL exports are written straight from the compiled bytes.
 const GEOM_LIMIT = 200000;
@@ -232,6 +233,12 @@ function parseLogs(logs, exitCode) {
   return out;
 }
 
+function looksOutOfMemory(logs) {
+  return /out of memory|OOM|Aborted\(|memory access out of bounds|Cannot enlarge memory|allocation failed/i.test(
+    (logs || []).join("\n")
+  );
+}
+
 function firstError(logs) {
   const line = (logs || []).find((entry) => /^ERROR/i.test(String(entry).trim()));
   return line ? String(line).trim() : "";
@@ -342,6 +349,15 @@ export async function compileOpenScad(source, options = {}) {
     ? new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).getUint32(80, true)
     : 0;
   const durationMs = Math.round(now() - started);
+
+  if (!triangleCount && looksOutOfMemory(raw.logs)) {
+    diagnostics.unshift({
+      severity: "error",
+      line: null,
+      message:
+        "The model is too heavy for the browser compiler and ran out of memory. Lower $fn or the number of repeated features, then compile again.",
+    });
+  }
 
   if (!triangleCount || raw.exitCode !== 0) {
     return {

@@ -38,8 +38,8 @@ export default function Mp3nowSettings({ onSync, syncState, onLibraryChanged }) 
   const nearLimit = usage.bytes > WARN_BYTES;
 
   return (
-    <div className="mp3-scroll flex-1 overflow-y-auto px-4 pb-40 pt-3 sm:px-7">
-      <h1 className="mb-4 text-[22px] font-semibold tracking-[-0.02em]">Settings</h1>
+    <div className="mp3-scroll mp3-page flex-1 overflow-y-auto">
+      <h1 className="mb-5 text-[24px] font-semibold tracking-[-0.02em]">Settings</h1>
 
       <Card title="Library">
         <button type="button" onClick={onSync} disabled={syncState.busy} className="mp3-btn w-full">
@@ -134,8 +134,8 @@ export default function Mp3nowSettings({ onSync, syncState, onLibraryChanged }) 
 
 function Card({ title, children }) {
   return (
-    <section className="mp3-glass mb-3 rounded-[20px] p-4">
-      <h2 className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.14em] text-[color:var(--m-muted)]">{title}</h2>
+    <section className="mp3-surface mb-4 p-5">
+      <h2 className="mb-3 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-[color:var(--m-muted)]">{title}</h2>
       {children}
     </section>
   );

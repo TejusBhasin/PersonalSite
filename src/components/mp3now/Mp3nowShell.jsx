@@ -11,11 +11,11 @@ export default function Mp3nowShell({ tab, onTab, children, hasPlayer }) {
   return (
     <div className="mp3-shell">
       <aside className="mp3-sidebar">
-        <div className="px-5 pb-4 pt-6">
+        <div className="px-5 pb-6 pt-7">
           <span className="mp3-wordmark-sm">MP3now</span>
-          <p className="mt-1 text-[11px] text-[color:var(--m-muted)]">Private cloud library</p>
+          <p className="mt-1.5 text-[11.5px] text-[color:var(--m-muted)]">Private cloud library</p>
         </div>
-        <nav className="flex flex-col gap-1 px-3">
+        <nav className="flex flex-col gap-0.5 px-3">
           {TABS.map(({ id, label, icon: Icon }) => (
             <button
               key={id}

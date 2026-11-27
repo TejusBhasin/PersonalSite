@@ -41,7 +41,7 @@ export default function Mp3nowLibrary() {
   if (browse) {
     const tracks = pool.filter((track) => track[browse.field] === browse.value);
     return (
-      <div className="mp3-scroll flex-1 overflow-y-auto px-4 pb-40 pt-3 sm:px-7">
+      <div className="mp3-scroll mp3-page flex-1 overflow-y-auto">
         <button type="button" onClick={() => setBrowse(null)} className="mp3-btn mp3-btn-ghost mb-3">
           <ChevronLeft className="h-4 w-4" />
           Library
@@ -54,10 +54,10 @@ export default function Mp3nowLibrary() {
   }
 
   return (
-    <div className="mp3-scroll flex-1 overflow-y-auto px-4 pb-40 pt-3 sm:px-7">
-      <h1 className="mb-3 text-[22px] font-semibold tracking-[-0.02em]">Library</h1>
+    <div className="mp3-scroll mp3-page flex-1 overflow-y-auto">
+      <h1 className="mb-5 text-[24px] font-semibold tracking-[-0.02em]">Library</h1>
 
-      <div className="mp3-scroll -mx-1 mb-4 flex gap-1.5 overflow-x-auto px-1 pb-1">
+      <div className="mp3-scroll -mx-1 mb-5 flex gap-2 overflow-x-auto px-1 pb-1">
         {SEGMENTS.map((item) => (
           <button
             key={item.id}
@@ -70,9 +70,9 @@ export default function Mp3nowLibrary() {
         ))}
       </div>
 
-      {state === "loading" && <div className="mp3-glass h-40 animate-pulse rounded-[20px]" />}
+      {state === "loading" && <div className="mp3-surface h-40 animate-pulse" />}
       {state === "error" && (
-        <p className="mp3-glass rounded-[18px] p-4 text-[12px] text-[color:var(--m-danger)]">
+        <p className="mp3-surface px-4 py-3.5 text-[12px] text-[color:var(--m-danger)]">
           The library could not be loaded.
         </p>
       )}
@@ -104,7 +104,7 @@ export default function Mp3nowLibrary() {
 
       {state === "ready" && segment === "offline" && (
         <>
-          <div className="mp3-glass mb-3 flex items-center gap-3 rounded-[18px] p-3.5">
+          <div className="mp3-surface mb-4 flex items-center gap-3 px-4 py-3.5">
             <span className="mp3-ai-badge">
               <CloudDownload className="h-4 w-4" />
             </span>
@@ -123,13 +123,13 @@ export default function Mp3nowLibrary() {
 function GroupList({ entries, icon: Icon, onSelect, emptyHint }) {
   if (!entries.length) {
     return (
-      <div className="mp3-glass rounded-[18px] p-5 text-center text-[12px] text-[color:var(--m-muted)]">{emptyHint}</div>
+      <div className="mp3-surface px-5 py-6 text-center text-[12.5px] text-[color:var(--m-muted)]">{emptyHint}</div>
     );
   }
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-2">
       {entries.map((entry) => (
-        <button key={entry.value} type="button" onClick={() => onSelect(entry.value)} className="mp3-glass mp3-row w-full">
+        <button key={entry.value} type="button" onClick={() => onSelect(entry.value)} className="mp3-surface mp3-row w-full">
           <Mp3nowArt src={entry.cover} name={entry.value} size="sm" rounded="rounded-[10px]" />
           <span className="min-w-0 flex-1 text-left">
             <span className="block truncate text-[13px] font-semibold">{entry.value}</span>

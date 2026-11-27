@@ -55,7 +55,7 @@ export default function Mp3nowSearch({ playlists, onOpenPlaylist }) {
         ? pool.filter((track) => track.artist === browse.value)
         : pool.filter((track) => track.album === browse.value);
     return (
-      <div className="mp3-scroll flex-1 overflow-y-auto px-4 pb-40 pt-3 sm:px-7">
+      <div className="mp3-scroll mp3-page flex-1 overflow-y-auto">
         <button type="button" onClick={() => setBrowse(null)} className="mp3-btn mp3-btn-ghost mb-3">
           <ChevronLeft className="h-4 w-4" />
           Search
@@ -70,8 +70,8 @@ export default function Mp3nowSearch({ playlists, onOpenPlaylist }) {
   }
 
   return (
-    <div className="mp3-scroll flex-1 overflow-y-auto px-4 pb-40 pt-3 sm:px-7">
-      <div className="relative mb-3">
+    <div className="mp3-scroll mp3-page flex-1 overflow-y-auto">
+      <div className="relative mb-4">
         <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[color:var(--m-muted)]" />
         <input
           value={term}
@@ -92,7 +92,7 @@ export default function Mp3nowSearch({ playlists, onOpenPlaylist }) {
         )}
       </div>
 
-      <div className="mp3-scroll -mx-1 mb-4 flex gap-1.5 overflow-x-auto px-1 pb-1">
+      <div className="mp3-scroll -mx-1 mb-5 flex gap-2 overflow-x-auto px-1 pb-1">
         {PILLS.map((item) => (
           <button
             key={item.id}
@@ -106,7 +106,7 @@ export default function Mp3nowSearch({ playlists, onOpenPlaylist }) {
       </div>
 
       {state === "error" && (
-        <p className="mp3-glass rounded-[18px] p-4 text-[12px] text-[color:var(--m-danger)]">
+        <p className="mp3-surface px-4 py-3.5 text-[12px] text-[color:var(--m-danger)]">
           The library could not be loaded.
         </p>
       )}
@@ -130,7 +130,7 @@ export default function Mp3nowSearch({ playlists, onOpenPlaylist }) {
                   key={entry.value}
                   type="button"
                   onClick={() => setBrowse({ kind: "artist", value: entry.value })}
-                  className="mp3-glass mp3-row mb-1.5 w-full"
+                  className="mp3-surface mp3-row mb-2 w-full"
                 >
                   <span className="mp3-ai-badge">
                     <User className="h-4 w-4" />
@@ -151,7 +151,7 @@ export default function Mp3nowSearch({ playlists, onOpenPlaylist }) {
                   key={entry.value}
                   type="button"
                   onClick={() => setBrowse({ kind: "album", value: entry.value })}
-                  className="mp3-glass mp3-row mb-1.5 w-full"
+                  className="mp3-surface mp3-row mb-2 w-full"
                 >
                   <Mp3nowArt src={entry.items.find((t) => t.coverArtDataUrl)?.coverArtDataUrl} name={entry.value} size="sm" rounded="rounded-[10px]" />
                   <span className="min-w-0 flex-1 text-left">
@@ -170,7 +170,7 @@ export default function Mp3nowSearch({ playlists, onOpenPlaylist }) {
                   key={playlist.id}
                   type="button"
                   onClick={() => onOpenPlaylist(playlist)}
-                  className="mp3-glass mp3-row mb-1.5 w-full"
+                  className="mp3-surface mp3-row mb-2 w-full"
                 >
                   <Mp3nowArt src={playlist.coverArtDataUrl} name={playlist.name} size="sm" rounded="rounded-[10px]" />
                   <span className="min-w-0 flex-1 text-left">

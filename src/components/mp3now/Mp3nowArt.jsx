@@ -11,7 +11,7 @@ export default function Mp3nowArt({ src, name = "", size = "md", className = "",
       className={`relative shrink-0 overflow-hidden ${dims} ${rounded} ${className}`}
       style={{
         background: `linear-gradient(150deg, hsl(${hue} 92% 62%), hsl(${(hue + 38) % 360} 88% 46%))`,
-        boxShadow: "0 10px 26px -14px rgba(10,40,90,0.55)",
+        boxShadow: "0 6px 16px -12px rgba(10,40,90,0.45)",
       }}
     >
       {src ? (

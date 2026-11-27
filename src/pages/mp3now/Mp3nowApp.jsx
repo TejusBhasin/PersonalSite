@@ -188,6 +188,7 @@ function Experience() {
           playlist={detail}
           tracks={detailTracks}
           state={detailState}
+          playlists={playlists}
           onBack={() => setDetail(null)}
         />
       );
